@@ -1,113 +1,122 @@
-# MLM HERO 🎮
-## Escape The Pyramid Before It Escapes With Your Savings
+# MLM HERO 🎮 ⚠️ WORK IN PROGRESS
+
+[![Godot 4.6](https://img.shields.io/badge/Godot-4.6-blue.svg)](https://godotengine.org)
+[![Status](https://img.shields.io/badge/status-WIP-yellow.svg)](https://github.com/weemadscotsman/mlm-hero)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+> **Escape The Pyramid Before It Escapes With Your Savings**
 
 ---
 
-## WHAT IS THIS?
+## 🚧 WARNING: ACTIVE DEVELOPMENT 🚧
 
-A comedy narrative strategy game about escaping MLM scams, infiltrating the megacorp that makes them, and helping others break free.
+This game is being built **live and in public**. Things will break. Things will change. That's half the fun.
 
-**Think:** Papers Please + Disco Elysium + Anti-Scam Education disguised as chaos
-
----
-
-## THE PITCH
-
-You play as someone who got burned by an MLM scam. Now you must:
-- Recover your lost money and dignity
-- Spot the patterns in scam operations
-- Infiltrate the megacorp that runs them all
-- Save other victims from the same fate
-- Learn to forgive yourself
-
-**Core Message:** "The system wants you to feel stupid. Don't give it that power."
+**Current Status:** 6/7 core rooms built | Alpha gameplay loop functional
 
 ---
 
-## KEY FEATURES
+## 🤔 WHAT IS THIS MADNESS?
 
-### 🧠 Brainrot Banishment System
-Make bad decisions? Get thrown into a vertical scrolling hell of:
+A **comedy narrative strategy game** about escaping MLM scams, infiltrating the megacorp that makes them, and helping others break free.
+
+**Think:** Papers Please + Disco Elysium + Anti-Scam Education disguised as absolute chaos
+
+### The Vibe
+- 😂 Laugh at scam culture (punching UP, never down)
+- 🧠 Actually learn to spot red flags
+- 💔 Feel things about people getting exploited
+- 🔥 Get angry at systems designed to hurt people
+
+---
+
+## 🎮 CURRENT BUILD FEATURES
+
+### ✅ What's Working NOW
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Bedroom | ✅ Complete | Tutorial, starting area |
+| City Hub | ✅ Complete | Central hub with 4 enterable buildings |
+| Coffee Shop | ✅ Complete | Uncle Kev's hangout |
+| MLM Office | ✅ Complete | Recruitment phase, Diamond Dave |
+| **Library** | ✅ **JUST ADDED** | Investigation, research computers |
+| Syndicate HQ | ✅ Complete | Stealth infiltration with guards |
+| Evidence System | ✅ Complete | Collectible evidence items |
+| Room Transitions | ✅ Complete | Seamless scene changing |
+| Dialogue System | ✅ Complete | NPC conversations |
+
+### 🔄 In Progress
+- Boss Arena (final confrontation)
+- Conversation battle system
+- Brainrot mini-game polish
+- Audio implementation
+
+### ⏳ Coming Soon
+- Full story beats (11 chapters)
+- Companion quest lines
+- Multiple endings
+- Steam release???
+
+---
+
+## 🚀 QUICK START
+
+### Play The Game
+
+1. **Download Godot 4.6** → https://godotengine.org/download
+2. **Clone this repo**
+   ```bash
+   git clone https://github.com/weemadscotsman/mlm-hero.git
+   ```
+3. **Open in Godot**
+   - Click "Import"
+   - Select `mlm-hero/project.godot`
+4. **Press F5** to run
+
+### Controls
+
+| Key | Action |
+|-----|--------|
+| `WASD` | Move |
+| `E` | Interact / Enter doors |
+| `Mouse` | UI, dialogue choices |
+
+---
+
+## 🧠 THE BRAINROT SYSTEM
+
+Make bad decisions? Get thrown into a **vertical scrolling hell** of:
 - Fake crypto bros shouting from Lambos
-- MLM boss babes with ring lights
+- MLM boss babes with ring lights  
 - AI-generated testimonials
 - Countdown timers and fake urgency
 
-**Gameplay:** Spot the red flags before your brain melts!
+**Survive by spotting the red flags before your brain melts.**
 
-### 🐕 The Repentance Box
-After surviving brainrot, recover in a calming chamber:
+Then recover in **The Repentance Box**:
 - Cute animals falling off things
 - Rain sounds and lo-fi beats
 - Goats screaming (therapeutic somehow)
-- System messages: "Installing Common Sense.dll..."
-
-### ⚔️ Conversation Battles
-Turn-based combat against scammers using:
-- **Toxic Positivity** attacks
-- **Fake Success Stories**
-- **Gaslighting** specials
-- **Urgency Timers**
-
-Counter with:
-- **Show Math** (requires Logic)
-- **Deploy Evidence** (requires Skepticism)
-- **Irish Goodbye** (escape instantly)
-
-### 🏢 Megacorp Infiltration
-Go undercover at the company behind ALL the scams:
-- Sabotage from within
-- Balance suspicion meter
-- Choose: save individuals or expose everything?
-- Climb the pyramid to destroy it
+- System messages: *"Installing Common Sense.dll..."*
 
 ---
 
-## COMPANIONS
+## 🏢 THE WORLD
 
-### 🏈 Coach Crystal
-The sports mom who just wanted community outside motherhood.
-> "I just wanted to feel like ME again. Not just 'mom'."
-
-### 📊 Gary  
-The defeated dad with six unfinished DIY projects.
-> "I just need ONE win, mate. Just one."
-
-### 🍺 Uncle Kev
-The chaos entrepreneur who's joined every scam.
-> "Mate, THIS one's different! ...oh."
+```
+BEDROOM (Start)
+    ↓
+CITY HUB (Central)
+    ├── ☕ Coffee Shop ← Uncle Kev
+    ├── 🏢 MLM Office ← Diamond Dave  
+    ├── 📚 LIBRARY ← NEW! Research & Evidence
+    └── 🏴 Syndicate Tower ← Infiltration
+```
 
 ---
 
-## STORY BEATS
-
-1. **The Pitch** - Friendly recruiter slides into DMs
-2. **Early Success** - False hope, first "profits"
-3. **The Collapse** - Platform goes down, money gone
-4. **The Isolation** - Family dinner awkwardness
-5. **Pattern Recognition** - These aren't different scams, they're CLONES
-6. **The Interview** - Enter the megacorp
-7. **Sabotage** - Working from inside
-8. **The Network Revealed** - All scams are connected
-9. **The Choice** - Blow cover or play the long game?
-10. **The Exposure** - Livestream takedown
-11. **The Aftermath** - Support group, 6 months later
-
----
-
-## THE SCAMS (Parody Versions)
-
-| Scam | Type | Target |
-|------|------|--------|
-| **Luminary Oasis** | Essential Oil MLM | Health-conscious parents |
-| **Bit-Konnexx** | Crypto Ponzi | FOMO-driven tech bros |
-| **Petchain Elite** | Crypto Pet NFT | Animal lovers |
-| **Passive Professor** | Dropshipping Course | Aspiring entrepreneurs |
-| **Manifestation Matrix** | Law of Attraction | Spiritual seekers |
-
----
-
-## COMEDY RULE
+## 🎨 COMEDY RULE
 
 **Punch UP:**
 - ✅ Systems of exploitation
@@ -117,109 +126,46 @@ The chaos entrepreneur who's joined every scam.
 
 **Never punch DOWN:**
 - ❌ Victims
-- ❌ Struggling people  
+- ❌ Struggling people
 - ❌ Genuine hope
 
-**Goal:** Players laugh while feeling "I've been there."
+**Goal:** Players laugh while feeling *"I've been there."*
 
 ---
 
-## ENDINGS
+## 🛠️ TECH STACK
 
-### The Survivor
-You helped who you could. The system continues, but you broke your own cycle.
-
-### The Exposer  
-You took down the megacorp. Became a public figure. Teach others.
-
-### The Community Builder
-Built a support network. Other survivors became allies.
-
-### The Fall
-You became what you fought. The cycle continues...
+- **Engine:** Godot 4.6
+- **Language:** GDScript
+- **Platform:** PC (Web/Mobile later)
+- **Art Style:** Prototype chic (colored rectangles with ATTITUDE)
 
 ---
 
-## DOCUMENTATION
+## 🤝 CONTRIBUTING
 
-| File | Contents |
-|------|----------|
-| `docs/STORY_BIBLE.md` | Full story, characters, emotional beats |
-| `docs/GAME_DESIGN.md` | All game systems, mechanics, stats |
-| `docs/CONTENT_BIBLE.md` | Scams, dialogue, NPCs, achievements |
-| `docs/TECH_DESIGN.md` | Architecture, code structure, roadmap |
+This is a **solo dev project** currently, but feedback is welcome!
 
----
-
-## DEVELOPMENT ROADMAP
-
-### Phase 1 (Weeks 1-2): Core
-- Scene manager
-- Stats system
-- Opening scenes
-
-### Phase 2 (Weeks 3-4): Battle
-- Conversation combat
-- 3 enemy types
-- First boss
-
-### Phase 3 (Weeks 5-6): Brainrot
-- Mini-game system
-- 10 video challenges
-- Visual effects
-
-### Phase 4 (Week 7): Repentance
-- Recovery system
-- Buff mechanics
-- Animal content
-
-### Phase 5 (Weeks 8-10): Story
-- All 11 beats
-- Companion arcs
-- Endings
-
-### Phase 6 (Weeks 11-12): Megacorp
-- Infiltration system
-- Sabotage mechanics
-- Final boss
-
-### Phase 7 (Weeks 13-14): Release
-- Audio
-- Polish
-- Build
+- 🐛 Found a bug? Open an issue
+- 💡 Got an idea? Start a discussion
+- 🎨 Want to contribute art/code? Hit me up
 
 ---
 
-## TECH STACK
+## 📜 LICENSE
 
-**Recommended: Godot 4**
-- Free & open source
-- Excellent for narrative games
-- Built-in UI system
-- Export to Web/PC/Mobile
-
-**Alternative: Python + Pygame**
-- Faster prototyping
-- Less polish potential
+MIT - Do what you want, just don't scam people with it (the irony would kill me)
 
 ---
 
-## WHY THIS GAME MATTERS
+## 🔗 LINKS
 
-1. **Educational** - Teaches scam recognition through play
-2. **Empathetic** - Shows victims as humans, not marks
-3. **Funny** - Satire makes the medicine go down
-4. **Timely** - Scams are evolving, awareness needs to too
-5. **Healing** - "I wanted it to be real" validates the struggle
+- 🎮 **Play:** [Coming Soon]
+- 🐦 **Twitter:** [@weemadscotsman](https://twitter.com/weemadscotsman)
+- 💬 **Discord:** [Coming Soon]
 
 ---
 
-## QUOTE TO BUILD BY
+> *"The system wants you to feel stupid. Don't give it that power."*
 
-> "The system wants you to feel stupid. Don't give it that power."
-
----
-
-Ready to build? Start with `docs/STORY_BIBLE.md` and work through the design docs!
-
-🎮 Let's make something that matters AND makes people laugh!
+**Built with chaos, caffeine, and a genuine hatred of pyramid schemes.** 🏴󠁧󠁢󠁳󠁣󠁴󠁿
