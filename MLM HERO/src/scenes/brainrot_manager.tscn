@@ -1,0 +1,143 @@
+[gd_scene load_steps=3 format=3 uid="uid://brainrot001"]
+
+[ext_resource type="Script" path="res://src/scripts/brainrot_manager.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_brainrot"]
+bg_color = Color(1.0, 0.0, 0.8, 0.95)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1.0, 1.0, 0.0, 1.0)
+
+[node name="BrainrotManager" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BrainrotOverlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.9, 0.1, 0.6, 0.3)
+
+[node name="BrainrotPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_brainrot")
+
+[node name="HeaderLabel" type="Label" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 10.0
+offset_bottom = 50.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 28
+text = "🧠 BRAINROT DETECTED 🧠"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 50.0
+offset_bottom = 80.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "You made bad choices. Now face the algorithm."
+horizontal_alignment = 1
+
+[node name="VideoTitle" type="Label" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 90.0
+offset_bottom = 120.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 20
+text = "📱 Loading..."
+horizontal_alignment = 1
+
+[node name="VideoContent" type="Label" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 130.0
+offset_right = -20.0
+offset_bottom = 180.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 24
+text = "..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TimerLabel" type="Label" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -100.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 24
+text = "⏰ 10s"
+horizontal_alignment = 2
+
+[node name="InstructionLabel" type="Label" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 185.0
+offset_bottom = 210.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Click the RED FLAGS to escape! Avoid fake positives!"
+horizontal_alignment = 1
+
+[node name="FlagContainer" type="VBoxContainer" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -180.0
+offset_right = -20.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="FeedbackLabel" type="Label" parent="BrainrotPanel"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = ""
+horizontal_alignment = 1

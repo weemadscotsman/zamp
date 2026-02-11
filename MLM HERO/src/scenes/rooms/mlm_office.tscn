@@ -1,0 +1,201 @@
+[gd_scene load_steps=4 format=3 uid="uid://mlmo1"]
+
+[ext_resource type="PackedScene" uid="uid://sharedui2" path="res://src/scenes/shared_ui.tscn" id="1_ui"]
+[ext_resource type="Script" path="res://src/scripts/room_mlm_office.gd" id="2_script"]
+[ext_resource type="PackedScene" path="res://src/scenes/npc.tscn" id="3_npc"]
+
+[node name="MLMOffice" type="Node2D"]
+script = ExtResource("2_script")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1200.0
+offset_bottom = 800.0
+color = Color(0.95, 0.9, 0.85, 1)
+
+[node name="Floor" type="ColorRect" parent="."]
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 1150.0
+offset_bottom = 750.0
+color = Color(0.9, 0.85, 0.8, 1)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="Top" type="CollisionShape2D" parent="Walls"]
+position = Vector2(600, -10)
+shape = SubResource("RectangleShape2D")
+
+[node name="Bottom" type="CollisionShape2D" parent="Walls"]
+position = Vector2(600, 810)
+shape = SubResource("RectangleShape2D")
+
+[node name="Left" type="CollisionShape2D" parent="Walls"]
+position = Vector2(-10, 400)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Right" type="CollisionShape2D" parent="Walls"]
+position = Vector2(1210, 400)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Furniture" type="Node2D" parent="."]
+
+[node name="ReceptionDesk" type="StaticBody2D" parent="Furniture"]
+position = Vector2(600, 150)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/ReceptionDesk"]
+shape = SubResource("RectangleShape2D3")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/ReceptionDesk"]
+offset_left = -100.0
+offset_top = -30.0
+offset_right = 100.0
+offset_bottom = 30.0
+color = Color(0.7, 0.6, 0.5, 1)
+
+[node name="Label" type="Label" parent="Furniture/ReceptionDesk"]
+offset_left = -80.0
+offset_top = -10.0
+offset_right = 80.0
+offset_bottom = 20.0
+text = "RECEPTION"
+horizontal_alignment = 1
+
+[node name="MeetingTable" type="StaticBody2D" parent="Furniture"]
+position = Vector2(300, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/MeetingTable"]
+shape = SubResource("RectangleShape2D4")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/MeetingTable"]
+offset_left = -80.0
+offset_top = -50.0
+offset_right = 80.0
+offset_bottom = 50.0
+color = Color(0.6, 0.5, 0.4, 1)
+
+[node name="DiamondDaveDesk" type="StaticBody2D" parent="Furniture"]
+position = Vector2(900, 200)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/DiamondDaveDesk"]
+shape = SubResource("RectangleShape2D5")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/DiamondDaveDesk"]
+offset_left = -60.0
+offset_top = -40.0
+offset_right = 60.0
+offset_bottom = 40.0
+color = Color(0.9, 0.8, 0.3, 1)
+
+[node name="Label" type="Label" parent="Furniture/DiamondDaveDesk"]
+offset_left = -50.0
+offset_top = -10.0
+offset_right = 50.0
+offset_bottom = 20.0
+theme_override_colors/font_color = Color(0.2, 0.1, 0.1, 1)
+text = "DAVE"
+horizontal_alignment = 1
+
+[node name="Chairs" type="Node2D" parent="Furniture"]
+
+[node name="Chair1" type="StaticBody2D" parent="Furniture/Chairs"]
+position = Vector2(300, 550)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/Chairs/Chair1"]
+shape = SubResource("RectangleShape2D6")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/Chairs/Chair1"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(0.5, 0.4, 0.35, 1)
+
+[node name="Chair2" type="StaticBody2D" parent="Furniture/Chairs"]
+position = Vector2(450, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/Chairs/Chair2"]
+shape = SubResource("RectangleShape2D6")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/Chairs/Chair2"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+color = Color(0.5, 0.4, 0.35, 1)
+
+[node name="DoorExit" type="Area2D" parent="."]
+position = Vector2(600, 780)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorExit"]
+shape = SubResource("RectangleShape2D7")
+
+[node name="Label" type="Label" parent="DoorExit"]
+offset_left = -40.0
+offset_top = -30.0
+offset_right = 40.0
+offset_bottom = -10.0
+text = "EXIT"
+horizontal_alignment = 1
+
+[node name="NPCs" type="Node2D" parent="."]
+
+[node name="DiamondDave" parent="NPCs" instance=ExtResource("3_npc")]
+position = Vector2(900, 280)
+npc_name = "Diamond Dave"
+npc_id = "diamond_dave"
+
+[node name="Receptionist" parent="NPCs" instance=ExtResource("3_npc")]
+position = Vector2(600, 220)
+npc_name = "Receptionist"
+npc_id = "receptionist"
+can_move = false
+
+[node name="NewRecruit" parent="NPCs" instance=ExtResource("3_npc")]
+position = Vector2(300, 480)
+npc_name = "Hopeful Recruit"
+npc_id = "new_recruit"
+can_move = false
+
+[node name="SpawnPoints" type="Node2D" parent="."]
+
+[node name="FromCity" type="Marker2D" parent="SpawnPoints"]
+position = Vector2(600, 700)
+
+[node name="Evidence" type="Node2D" parent="."]
+
+[node name="IncomePoster" parent="Evidence" instance=ExtResource("res://src/scenes/evidence_item.tscn")]
+position = Vector2(200, 150)
+evidence_id = "fabricated_success"
+evidence_name = "Income Poster"
+description = "Claims of $50k/month earnings with luxury cars"
+strength = 2
+
+[node name="RecruitmentScript" parent="Evidence" instance=ExtResource("res://src/scenes/evidence_item.tscn")]
+position = Vector2(950, 280)
+evidence_id = "pressure_scripts"
+evidence_name = "Recruitment Script"
+description = "'If they say no, ask why they hate success'"
+strength = 2
+
+[node name="SharedUI" parent="." instance=ExtResource("1_ui")]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D"]
+size = Vector2(1200, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D2"]
+size = Vector2(20, 800)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D3"]
+size = Vector2(200, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D4"]
+size = Vector2(160, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D5"]
+size = Vector2(120, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D6"]
+size = Vector2(40, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D7"]
+size = Vector2(80, 20)

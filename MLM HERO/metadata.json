@@ -1,0 +1,5 @@
+{
+  "name": "Dream3DForge",
+  "description": "Professional AI Game Engine. Features: Deterministic Seeding, Spec/Build Separation, Procedural Audio, and Live Telemetry.",
+  "requestFramePermissions": []
+}

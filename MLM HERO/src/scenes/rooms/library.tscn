@@ -1,0 +1,199 @@
+[gd_scene load_steps=3 format=3 uid="uid://library1"]
+
+[ext_resource type="PackedScene" uid="uid://sharedui2" path="res://src/scenes/shared_ui.tscn" id="1_ui"]
+[ext_resource type="Script" path="res://src/scripts/room_library.gd" id="2_script"]
+
+[node name="Library" type="Node2D"]
+script = ExtResource("2_script")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 800.0
+offset_bottom = 600.0
+color = Color(0.15, 0.2, 0.25, 1)
+
+[node name="Floor" type="ColorRect" parent="."]
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 750.0
+offset_bottom = 550.0
+color = Color(0.3, 0.35, 0.4, 1)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="Top" type="CollisionShape2D" parent="Walls"]
+position = Vector2(400, -10)
+shape = SubResource("RectangleShape2D")
+
+[node name="Bottom" type="CollisionShape2D" parent="Walls"]
+position = Vector2(400, 610)
+shape = SubResource("RectangleShape2D")
+
+[node name="Left" type="CollisionShape2D" parent="Walls"]
+position = Vector2(-10, 300)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Right" type="CollisionShape2D" parent="Walls"]
+position = Vector2(810, 300)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Furniture" type="Node2D" parent="."]
+
+[node name="Bookshelves" type="Node2D" parent="Furniture"]
+
+[node name="Shelf1" type="StaticBody2D" parent="Furniture/Bookshelves"]
+position = Vector2(100, 100)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/Bookshelves/Shelf1"]
+shape = SubResource("RectangleShape2D3")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/Bookshelves/Shelf1"]
+offset_left = -60.0
+offset_top = -40.0
+offset_right = 60.0
+offset_bottom = 40.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="Label" type="Label" parent="Furniture/Bookshelves/Shelf1"]
+offset_left = -40.0
+offset_top = -10.0
+offset_right = 40.0
+offset_bottom = 20.0
+text = "BOOKS"
+horizontal_alignment = 1
+
+[node name="Shelf2" type="StaticBody2D" parent="Furniture/Bookshelves"]
+position = Vector2(700, 100)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/Bookshelves/Shelf2"]
+shape = SubResource("RectangleShape2D3")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/Bookshelves/Shelf2"]
+offset_left = -60.0
+offset_top = -40.0
+offset_right = 60.0
+offset_bottom = 40.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="Label" type="Label" parent="Furniture/Bookshelves/Shelf2"]
+offset_left = -40.0
+offset_top = -10.0
+offset_right = 40.0
+offset_bottom = 20.0
+text = "ARCHIVES"
+horizontal_alignment = 1
+
+[node name="Shelf3" type="StaticBody2D" parent="Furniture/Bookshelves"]
+position = Vector2(100, 450)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/Bookshelves/Shelf3"]
+shape = SubResource("RectangleShape2D3")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/Bookshelves/Shelf3"]
+offset_left = -60.0
+offset_top = -40.0
+offset_right = 60.0
+offset_bottom = 40.0
+color = Color(0.4, 0.3, 0.2, 1)
+
+[node name="Label" type="Label" parent="Furniture/Bookshelves/Shelf3"]
+offset_left = -50.0
+offset_top = -10.0
+offset_right = 50.0
+offset_bottom = 20.0
+text = "RESEARCH"
+horizontal_alignment = 1
+
+[node name="ComputerStation" type="StaticBody2D" parent="Furniture"]
+position = Vector2(400, 150)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/ComputerStation"]
+shape = SubResource("RectangleShape2D4")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/ComputerStation"]
+offset_left = -80.0
+offset_top = -30.0
+offset_right = 80.0
+offset_bottom = 30.0
+color = Color(0.2, 0.25, 0.3, 1)
+
+[node name="Label" type="Label" parent="Furniture/ComputerStation"]
+offset_left = -60.0
+offset_top = -10.0
+offset_right = 60.0
+offset_bottom = 20.0
+text = "COMPUTERS"
+horizontal_alignment = 1
+
+[node name="ReadingTable" type="StaticBody2D" parent="Furniture"]
+position = Vector2(400, 350)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/ReadingTable"]
+shape = SubResource("RectangleShape2D5")
+
+[node name="ColorRect" type="ColorRect" parent="Furniture/ReadingTable"]
+offset_left = -60.0
+offset_top = -40.0
+offset_right = 60.0
+offset_bottom = 40.0
+color = Color(0.5, 0.45, 0.35, 1)
+
+[node name="Label" type="Label" parent="Furniture/ReadingTable"]
+offset_left = -40.0
+offset_top = -10.0
+offset_right = 40.0
+offset_bottom = 20.0
+text = "STUDY"
+horizontal_alignment = 1
+
+[node name="Exit" type="Area2D" parent="."]
+position = Vector2(400, 580)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Exit"]
+shape = SubResource("RectangleShape2D6")
+
+[node name="Label" type="Label" parent="Exit"]
+offset_left = -40.0
+offset_top = -30.0
+offset_right = 40.0
+offset_bottom = -10.0
+text = "EXIT"
+horizontal_alignment = 1
+
+[node name="Spawn" type="Marker2D" parent="."]
+position = Vector2(400, 450)
+
+[node name="Evidence" type="Node2D" parent="."]
+
+[node name="IncomeDisclosure" parent="Evidence" instance=ExtResource("res://src/scenes/evidence_item.tscn")]
+position = Vector2(700, 450)
+evidence_id = "income_disclosure"
+evidence_name = "Income Disclosure Statement"
+description = "Official document showing 99% of 'consultants' lose money."
+strength = 2
+
+[node name="CompanyHistory" parent="Evidence" instance=ExtResource("res://src/scenes/evidence_item.tscn")]
+position = Vector2(150, 250)
+evidence_id = "company_history"
+evidence_name = "Archived Articles"
+description = "Newspaper clippings about Diamond Dynamics' previous scam names."
+strength = 2
+
+[node name="SharedUI" parent="." instance=ExtResource("1_ui")]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D"]
+size = Vector2(800, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D2"]
+size = Vector2(20, 600)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D3"]
+size = Vector2(120, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D4"]
+size = Vector2(160, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D5"]
+size = Vector2(120, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D6"]
+size = Vector2(80, 20)

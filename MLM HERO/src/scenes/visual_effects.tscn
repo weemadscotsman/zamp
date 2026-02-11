@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://vfx1"]
+
+[node name="VisualEffects" type="CanvasLayer"]
+layer = 50
+
+[node name="ShakeCamera" type="Camera2D" parent="."]
+anchor_mode = 0
+
+[node name="Particles" type="Node2D" parent="."]

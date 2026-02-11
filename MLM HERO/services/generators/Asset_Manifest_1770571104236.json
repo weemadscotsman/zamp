@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "tool": "CANN.ON.AI",
+  "id": "ca80c9b1-a85c-4feb-8005-62a67c346a92",
+  "timestamp": "2026-02-08T17:18:24.236Z",
+  "parameters": {
+    "prompt": "Cyberpunk neon style, glitch aesthetic",
+    "model": "gemini-2.5-flash-image",
+    "style": "2D_SPRITE",
+    "seed": 12345,
+    "engineFormat": "Universal"
+  },
+  "assets": {
+    "main": "albedo.png",
+    "normal": null,
+    "roughness": null,
+    "orm": null,
+    "height": null,
+    "spriteSheet": "sheet.png"
+  }
+}

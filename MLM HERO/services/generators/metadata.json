@@ -1,0 +1,5 @@
+{
+  "name": "CANN.ON.AI",
+  "description": "Transform 2D images into game-ready sprites, Normal maps, and Roughness maps using Nano Banana models. Export directly for Unity, Unreal Engine 5, and Godot.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,130 @@
+================================================================================
+  MLM HERO - PROJECT CLEANUP COMPLETE
+  Date: 2026-02-09
+================================================================================
+
+PROBLEM IDENTIFIED:
+Multiple duplicate project files were confusing Godot:
+- τρ-mlm-hero/ folder (96 files - OLD VERSION)
+- cann.on.ai (2)/ folder (25 files)
+- cann.on.ai-studios/ folder (17 files)
+- dream3dforge (1)/ folder (61 files)
+
+These contained old project.godot files that Godot was loading instead of 
+the correct one.
+
+================================================================================
+ACTIONS TAKEN:
+================================================================================
+
+✓ Created OLD_VERSIONS/ folder
+✓ Moved all duplicate projects to OLD_VERSIONS/
+✓ Verified only ONE project.godot remains in root
+✓ Confirmed main_scene points to correct file
+✓ Verified src/scenes/main_menu.tscn exists
+
+================================================================================
+CURRENT PROJECT STRUCTURE:
+================================================================================
+
+MLM HERO/
+├── project.godot          ← ONLY project file (loads main_menu.tscn)
+├── addons/                ← Crossword Architect addon
+├── assets/                ← Art, music, sfx
+├── components/            ← UI components
+├── data/                  ← Scene data JSON
+├── docs/                  ← Documentation
+├── OLD_VERSIONS/          ← [ARCHIVED OLD FILES]
+│   ├── OLD_MLM_HERO_GREEK/    (96 files)
+│   ├── cann_on_ai__2_/        (25 files)
+│   ├── cann_on_ai-studios/    (17 files)
+│   └── dream3dforge__1_/      (61 files)
+├── services/              ← Backend services
+├── src/
+│   ├── scenes/            ← 22 Godot scenes
+│   │   └── main_menu.tscn ← ← ENTRY POINT
+│   └── scripts/           ← 39 GDScript files
+└── utils/                 ← Utility functions
+
+================================================================================
+HOW TO OPEN CORRECTLY:
+================================================================================
+
+METHOD 1: Godot Project Manager
+1. Open Godot 4.2+
+2. In Project Manager, click "Import"
+3. Navigate to: C:\Users\Admin\Desktop\MLM HERO
+4. Select: project.godot
+5. Click "Import & Edit"
+6. Press F5 to run
+
+METHOD 2: Direct File Open
+1. Open Godot 4.2+
+2. File → Open Project
+3. Navigate to: C:\Users\Admin\Desktop\MLM HERO\project.godot
+4. Click Open
+5. Press F5 to run
+
+METHOD 3: Drag and Drop
+1. Open Godot 4.2+
+2. Drag project.godot file into Godot window
+
+================================================================================
+VERIFICATION CHECKLIST:
+================================================================================
+
+Before running, verify:
+□ You see "MLM Hero" in the project name
+□ The main scene shows "main_menu.tscn" 
+□ No import errors appear
+□ The Main Menu shows with "Start Game" button
+
+================================================================================
+IF IT STILL LOADS OLD GAME:
+================================================================================
+
+1. CLEAR GODOT CACHE:
+   - Close Godot completely
+   - Delete folder: C:\Users\[YourName]\AppData\Roaming\Godot\projects_cache
+   - Restart Godot
+
+2. RECREATE PROJECT.GODOT:
+   - Delete project.godot in root
+   - Create new project in Godot
+   - Set main scene to src/scenes/main_menu.tscn
+
+3. CHECK FOR OTHER DUPLICATES:
+   - Search entire computer for "project.godot"
+   - Remove any duplicates in MLM HERO folder
+
+================================================================================
+EXPECTED BEHAVIOR:
+================================================================================
+
+When you open project.godot in Godot:
+→ Project Manager shows "MLM Hero"
+→ Opening it loads main_menu.tscn
+→ Main Menu displays with:
+   - "MLM HERO" title
+   - "Start Game" button
+   - "Load Game" button
+   - Background music
+
+When you press F5:
+→ Game starts at Main Menu
+→ Clicking "Start Game" goes to Phase 1
+→ All systems work (save, dialogue, evidence, etc.)
+
+================================================================================
+STATUS: ✅ READY TO RUN
+================================================================================
+
+The project now has ONLY the correct files.
+No more duplicate projects to confuse Godot.
+
+If issues persist, check:
+1. Godot version is 4.2 or higher
+2. You're opening C:\Users\Admin\Desktop\MLM HERO\project.godot
+3. No other Godot instances are running
+
+================================================================================

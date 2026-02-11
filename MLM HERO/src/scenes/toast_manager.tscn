@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://toast1"]
+
+[ext_resource type="Script" path="res://src/scripts/toast_manager.gd" id="1_toast"]
+
+[node name="ToastManager" type="CanvasLayer"]
+layer = 60
+
+[node name="ToastContainer" type="Control" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -300.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="Script" type="Node" parent="."]
+script = ExtResource("1_toast")

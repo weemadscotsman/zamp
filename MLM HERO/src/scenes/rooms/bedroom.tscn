@@ -1,0 +1,84 @@
+[gd_scene load_steps=5 format=3 uid="uid://bedroom1"]
+
+[ext_resource type="PackedScene" uid="uid://sharedui2" path="res://src/scenes/shared_ui.tscn" id="1_ui"]
+[ext_resource type="Script" path="res://src/scripts/room_bedroom.gd" id="2_room"]
+[ext_resource type="PackedScene" path="res://src/scenes/player.tscn" id="3_player"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D"]
+size = Vector2(800, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D2"]
+size = Vector2(20, 600)
+
+[node name="Bedroom" type="Node2D"]
+script = ExtResource("2_room")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 800.0
+offset_bottom = 600.0
+color = Color(0.08, 0.05, 0.12, 1)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="Top" type="CollisionShape2D" parent="Walls"]
+position = Vector2(400, -10)
+shape = SubResource("RectangleShape2D")
+
+[node name="Bottom" type="CollisionShape2D" parent="Walls"]
+position = Vector2(400, 610)
+shape = SubResource("RectangleShape2D")
+
+[node name="Left" type="CollisionShape2D" parent="Walls"]
+position = Vector2(-10, 300)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Right" type="CollisionShape2D" parent="Walls"]
+position = Vector2(810, 300)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Furniture" type="Node2D" parent="."]
+
+[node name="Bed" type="ColorRect" parent="Furniture"]
+offset_left = 60.0
+offset_top = 240.0
+offset_right = 140.0
+offset_bottom = 360.0
+color = Color(0.4, 0.3, 0.5, 1)
+
+[node name="BedCollision" type="StaticBody2D" parent="Furniture/Bed"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/Bed/BedCollision"]
+position = Vector2(40, 60)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Desk" type="ColorRect" parent="Furniture"]
+offset_left = 570.0
+offset_top = 130.0
+offset_right = 630.0
+offset_bottom = 170.0
+color = Color(0.5, 0.4, 0.3, 1)
+
+[node name="DeskCollision" type="StaticBody2D" parent="Furniture/Desk"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Furniture/Desk/DeskCollision"]
+position = Vector2(30, 20)
+shape = SubResource("RectangleShape2D2")
+
+[node name="Door" type="Area2D" parent="."]
+position = Vector2(400, 580)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Door"]
+shape = SubResource("RectangleShape2D2")
+
+[node name="Label" type="Label" parent="Door"]
+offset_left = -40.0
+offset_top = -30.0
+offset_right = 40.0
+offset_bottom = -10.0
+text = "EXIT"
+horizontal_alignment = 1
+
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(400, 400)
+
+[node name="SharedUI" parent="." instance=ExtResource("1_ui")]

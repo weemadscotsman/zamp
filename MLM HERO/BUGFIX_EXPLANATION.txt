@@ -1,0 +1,131 @@
+================================================================================
+  MLM HERO - CRITICAL BUG FIXED
+  Date: 2026-02-09
+================================================================================
+
+PROBLEM REPORTED:
+"When I open it I still get the old start menu and stat button, nothing works"
+
+================================================================================
+ROOT CAUSE IDENTIFIED
+================================================================================
+
+UID MISMATCH in room scenes!
+
+Godot uses unique IDs (UIDs) to track resources. When a scene references
+another scene by UID, but that UID doesn't exist, the load fails.
+
+THE MISMATCH:
+- All room scenes (bedroom.tscn, city_hub.tscn, etc.) referenced:
+  uid://sharedui1 (SharedUI)
+  
+- But shared_ui.tscn actually has:
+  uid://sharedui2
+
+This 1-character difference (1 vs 2) broke EVERYTHING.
+
+================================================================================
+WHY IT LOADED THE OLD GAME
+================================================================================
+
+In main_menu.gd, there was a fallback:
+
+    var result = get_tree().change_scene_to_file("res://src/scenes/rooms/bedroom.tscn")
+    if result != OK:
+        print("ERROR: Failed to load bedroom scene!")
+        # Fallback to simple game
+        get_tree().change_scene_to_file("res://src/scenes/simple_game.tscn")
+
+When bedroom.tscn failed to load (due to UID mismatch), it silently fell back
+to simple_game.tscn - which is the OLD visual novel prototype.
+
+That's why you saw:
+- Old start menu (from simple_game)
+- Stat button (from simple_game)
+- Nothing working (simple_game is a prototype)
+
+================================================================================
+FILES FIXED
+================================================================================
+
+✓ src/scenes/rooms/bedroom.tscn
+✓ src/scenes/rooms/city_hub.tscn
+✓ src/scenes/rooms/coffee_shop.tscn
+✓ src/scenes/rooms/mlm_office.tscn
+✓ src/scenes/rooms/syndicate_hq.tscn
+
+Also updated:
+✓ src/scripts/main_menu.gd - Removed fallback to old game
+
+================================================================================
+HOW TO TEST
+================================================================================
+
+1. CLOSE GODOT completely (File → Quit)
+2. REOPEN Godot
+3. Open MLM HERO project
+4. Click START GAME
+5. You should now see:
+   - Bedroom scene (dark purple background)
+   - Player character (in center)
+   - SharedUI at top (Followers, Skepticism, etc.)
+   - Can move with WASD
+
+================================================================================
+IF IT STILL DOESN'T WORK
+================================================================================
+
+Try clearing Godot's cache:
+
+1. Close Godot
+2. Delete this folder:
+   C:\Users\[YourName]\AppData\Roaming\Godot\projects_cache
+   
+3. Also delete in project folder:
+   .godot/ (hidden folder)
+   
+4. Reopen project
+5. Godot will reimport everything fresh
+
+================================================================================
+WHAT WAS THE OLD GAME?
+================================================================================
+
+simple_game.tscn / simple_game.gd was an early prototype:
+- Visual novel style (text + choices)
+- Single screen
+- Stat button in corner
+- No actual gameplay
+
+This was replaced by:
+- Top-down RPG movement
+- Multiple rooms
+- Evidence collection
+- Stealth mechanics
+- Proper save system
+
+But the fallback code kept bringing it back!
+
+================================================================================
+PREVENTING THIS IN FUTURE
+================================================================================
+
+Godot sometimes regenerates UIDs when:
+- Copying scenes between projects
+- Renaming files
+- Moving files between folders
+
+ALWAYS:
+1. Use "Save As" in Godot editor, not file copy
+2. Let Godot handle UIDs automatically
+3. Check UIDs match if moving scenes manually
+
+================================================================================
+STATUS: ✅ FIXED
+================================================================================
+
+All room scenes now reference the correct SharedUI UID.
+The fallback to old game has been removed.
+Start button will show error message if loading fails (instead of old game).
+
+================================================================================

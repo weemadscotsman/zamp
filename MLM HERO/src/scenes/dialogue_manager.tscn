@@ -1,0 +1,66 @@
+[gd_scene load_steps=2 format=3 uid="uid://dialogue1"]
+
+[ext_resource type="Script" path="res://src/scripts/dialogue_manager.gd" id="1_script"]
+
+[node name="DialogueManager" type="CanvasLayer"]
+layer = 50
+script = ExtResource("1_script")
+
+[node name="DialogueBox" type="Panel" parent="."]
+visible = false
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 50.0
+offset_top = -180.0
+offset_right = -50.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="NameLabel" type="Label" parent="DialogueBox"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 10.0
+offset_right = 200.0
+offset_bottom = 40.0
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.8, 0.3, 1)
+text = "Name"
+
+[node name="Portrait" type="TextureRect" parent="DialogueBox"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 100.0
+offset_bottom = 130.0
+expand_mode = 1
+
+[node name="TextLabel" type="Label" parent="DialogueBox"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 50.0
+offset_right = 1080.0
+offset_bottom = 120.0
+theme_override_font_sizes/font_size = 18
+text = "Dialogue text goes here..."
+autowrap_mode = 3
+
+[node name="ChoicesContainer" type="VBoxContainer" parent="DialogueBox"]
+visible = false
+layout_mode = 0
+offset_left = 120.0
+offset_top = 50.0
+offset_right = 600.0
+offset_bottom = 150.0
+theme_override_constants/separation = 10
+
+[node name="AdvanceIndicator" type="Label" parent="DialogueBox"]
+layout_mode = 0
+offset_left = 1060.0
+offset_top = 130.0
+offset_right = 1100.0
+offset_bottom = 160.0
+theme_override_font_sizes/font_size = 24
+text = "▼"

@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://ambient1"]
+
+[ext_resource type="Script" path="res://src/scripts/ambient_effects.gd" id="1_ambient"]
+
+[node name="AmbientEffects" type="CanvasLayer"]
+layer = -1
+
+[node name="BGParticles" type="Node2D" parent="."]
+
+[node name="FloatingShapes" type="Node2D" parent="."]
+
+[node name="Script" type="Node" parent="."]
+script = ExtResource("1_ambient")

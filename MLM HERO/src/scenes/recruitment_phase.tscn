@@ -1,0 +1,292 @@
+[gd_scene load_steps=4 format=3 uid="uid://recruit1"]
+
+[ext_resource type="Script" path="res://src/scripts/recruitment_phase.gd" id="1_recruit"]
+[ext_resource type="PackedScene" uid="uid://sharedui1" path="res://src/scenes/shared_ui.tscn" id="2_ui"]
+[ext_resource type="PackedScene" uid="uid://transition1" path="res://src/scenes/phase_transition.tscn" id="3_trans"]
+
+[node name="RecruitmentPhase" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_recruit")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.05, 0.05, 1)
+
+[node name="SharedUI" parent="." instance=ExtResource("2_ui")]
+
+[node name="PhaseTransition" parent="." instance=ExtResource("3_trans")]
+
+[node name="RecruitmentUI" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 800.0
+offset_bottom = 520.0
+
+[node name="WeekLabel" type="Label" parent="RecruitmentUI"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 150.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 20
+text = "📅 Week 1/4"
+
+[node name="DebtLabel" type="Label" parent="RecruitmentUI"]
+layout_mode = 0
+offset_left = 180.0
+offset_top = 15.0
+offset_right = 300.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.5, 0.5, 1)
+text = "💸 Debt: $299"
+
+[node name="RecruitsLabel" type="Label" parent="RecruitmentUI"]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 15.0
+offset_right = 480.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 16
+text = "👥 Recruits: 0/3"
+
+[node name="GuiltLabel" type="Label" parent="RecruitmentUI"]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 15.0
+offset_right = 620.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 16
+text = "😰 Guilt: 0"
+
+[node name="RecruitmentPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 80.0
+offset_right = 400.0
+offset_bottom = 520.0
+
+[node name="TitleLabel" type="Label" parent="RecruitmentPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 330.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
+text = "🎯 POTENTIAL RECRUITS"
+
+[node name="SubtitleLabel" type="Label" parent="RecruitmentPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 330.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 12
+text = "Choose someone to approach..."
+
+[node name="RecruitList" type="VBoxContainer" parent="RecruitmentUI"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 90.0
+offset_right = 330.0
+offset_bottom = 420.0
+theme_override_constants/separation = 10
+
+[node name="InfoPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 80.0
+offset_right = 750.0
+offset_bottom = 300.0
+
+[node name="TitleLabel" type="Label" parent="InfoPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 310.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+text = "⚠️ THE REALITY"
+
+[node name="InfoText" type="Label" parent="InfoPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 310.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 12
+text = "You're now in the MLM.\n\nTo 'succeed', you must recruit others.\nEach person you recruit pays you a cut.\n\nBut most will lose money.\nSome will lose everything.\n\n🔴 High Vulnerability = Easy target\n🟡 Medium = Some resistance\n🟢 Low = Will see through it\n\nYour choice: exploit or refuse?"
+autowrap_mode = 3
+
+[node name="TargetPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 420.0
+offset_top = 310.0
+offset_right = 750.0
+offset_bottom = 520.0
+
+[node name="TargetName" type="Label" parent="TargetPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 310.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 20
+text = "Target Name"
+
+[node name="TargetDesc" type="Label" parent="TargetPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 50.0
+offset_right = 310.0
+offset_bottom = 150.0
+theme_override_font_sizes/font_size = 12
+text = "Description..."
+autowrap_mode = 3
+
+[node name="TacticsPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 50.0
+offset_top = 80.0
+offset_right = 750.0
+offset_bottom = 520.0
+
+[node name="TitleLabel" type="Label" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 680.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.9, 0.3, 0.3, 1)
+text = "🎭 CHOOSE YOUR APPROACH"
+
+[node name="TacticsList" type="VBoxContainer" parent="TacticsPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 70.0
+offset_right = 680.0
+offset_bottom = 420.0
+theme_override_constants/separation = 10
+
+[node name="ResultLabel" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 20
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ReflectionPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ReflectionText" type="Label" parent="ReflectionPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 570.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 16
+text = "Reflection..."
+autowrap_mode = 3
+
+[node name="ContinueReflectionButton" type="Button" parent="ReflectionPanel"]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 320.0
+offset_right = 400.0
+offset_bottom = 360.0
+theme_override_font_sizes/font_size = 18
+text = "Continue"
+
+[node name="StatusLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 530.0
+offset_right = 750.0
+offset_bottom = 560.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = ""
+horizontal_alignment = 1
+
+[node name="GameOverPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="GameOverPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 570.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="DescLabel" type="Label" parent="GameOverPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 100.0
+offset_right = 570.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 16
+text = "Description..."
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="GameOverPanel"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 320.0
+offset_right = 450.0
+offset_bottom = 360.0
+theme_override_font_sizes/font_size = 18
+text = "Continue"
+
+[connection signal="pressed" from="ReflectionPanel/ContinueReflectionButton" to="." method="_on_continue_reflection_pressed"]

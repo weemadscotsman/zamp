@@ -1,0 +1,267 @@
+{
+  "act": "The Hustle Dream",
+  "scenes": {
+    "beat_1_streamer_opening": {
+      "background": "streamer_room_neon",
+      "music": "upbeat_hype",
+      "dialogue_sequence": [
+        {
+          "speaker": "narrator",
+          "text": "8:47 PM. Your bedroom glows with ring lights.",
+          "effects": []
+        },
+        {
+          "speaker": "narrator", 
+          "text": "847 followers. Not bad for 3 months of grinding.",
+          "effects": []
+        },
+        {
+          "speaker": "hero",
+          "text": "Alright chat, we're going LIVE in 10!",
+          "portrait": "hero_confident",
+          "effects": []
+        },
+        {
+          "speaker": "hero",
+          "text": "Tonight we're diving into PASSIVE INCOME strategies!",
+          "portrait": "hero_confident",
+          "effects": []
+        },
+        {
+          "speaker": "narrator",
+          "text": "You open your 'dashboard.' The numbers look good.",
+          "effects": []
+        },
+        {
+          "speaker": "narrator",
+          "text": "$347 this week. All from your phone.",
+          "effects": [{"stat": "confidence", "value": 5}]
+        },
+        {
+          "speaker": "hero",
+          "text": "This system changed my LIFE, guys. And it can change YOURS too!",
+          "portrait": "hero_excited",
+          "effects": []
+        }
+      ],
+      "choices": [
+        {
+          "id": "go_live",
+          "text": "Start the stream - time to hustle!",
+          "next_scene": "beat_1_live_stream",
+          "effects": [{"stat": "social_credit", "value": 5}],
+          "set_flag": "started_stream"
+        },
+        {
+          "id": "check_messages",
+          "text": "Check DMs first...",
+          "next_scene": "beat_1_dm_from_sarah",
+          "effects": [{"stat": "skepticism", "value": 2}]
+        }
+      ]
+    },
+    
+    "beat_1_dm_from_sarah": {
+      "background": "phone_screen",
+      "music": "notification_ping",
+      "dialogue_sequence": [
+        {
+          "speaker": "narrator",
+          "text": "Your phone buzzes. New DM.",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "Hey! 👋 I noticed we have mutual friends in the hustle community!",
+          "portrait": "sarah_friendly",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "I was EXACTLY where you are 6 months ago.",
+          "portrait": "sarah_friendly",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "Small following, grinding every day, watching others succeed...",
+          "portrait": "sarah_understanding",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "Then I found something that changed EVERYTHING 💕",
+          "portrait": "sarah_excited",
+          "effects": []
+        },
+        {
+          "speaker": "hero",
+          "text": "[You feel a flutter of hope. Someone sees you.]",
+          "portrait": "hero_hopeful",
+          "effects": [{"stat": "confidence", "value": 3}]
+        }
+      ],
+      "choices": [
+        {
+          "id": "hear_more",
+          "text": "Tell me more! 📱",
+          "next_scene": "beat_1_sarah_pitch",
+          "effects": [{"stat": "innocence", "value": 5}],
+          "set_flag": "listening_to_sarah"
+        },
+        {
+          "id": "be_cautious",
+          "text": "What kind of opportunity?",
+          "next_scene": "beat_1_sarah_pressure",
+          "effects": [{"stat": "skepticism", "value": 5}]
+        },
+        {
+          "id": "ignore",
+          "text": "Sorry, not interested in MLMs",
+          "next_scene": "beat_1_sarah_persistence",
+          "effects": [{"stat": "skepticism", "value": 10}, {"stat": "social_credit", "value": -2}]
+        }
+      ]
+    },
+    
+    "beat_1_sarah_pitch": {
+      "background": "phone_screen",
+      "music": "hopeful_ambient",
+      "dialogue_sequence": [
+        {
+          "speaker": "sarah",
+          "text": "OMG I'm so glad you asked! 💕",
+          "portrait": "sarah_excited",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "It's not an MLM - it's direct social commerce!",
+          "portrait": "sarah_explaining",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "I made $12,000 last month working 2 hours a day!",
+          "portrait": "sarah_proud",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "Here's a screenshot from my dashboard!",
+          "portrait": "sarah_screenshot",
+          "effects": []
+        },
+        {
+          "speaker": "narrator",
+          "text": "The screenshot shows impressive numbers.",
+          "effects": []
+        },
+        {
+          "speaker": "narrator",
+          "text": "Something feels... almost too perfect?",
+          "effects": [{"stat": "skepticism", "value": 2}]
+        },
+        {
+          "speaker": "sarah",
+          "text": "I only have 3 spots left for my mentorship program this week!",
+          "portrait": "sarah_urgent",
+          "effects": []
+        },
+        {
+          "speaker": "sarah",
+          "text": "Are you ready to level up? 🚀",
+          "portrait": "sarah_urgent",
+          "effects": []
+        }
+      ],
+      "choices": [
+        {
+          "id": "join_now",
+          "text": "YES! I'm ready to change my life!",
+          "next_scene": "beat_2_early_success",
+          "effects": [{"stat": "innocence", "value": 10}, {"stat": "money", "value": -299}, {"stat": "financial_health", "value": -299}],
+          "set_flag": "joined_luminary_oasis"
+        },
+        {
+          "id": "ask_questions",
+          "text": "Can I see the income disclosure?",
+          "next_scene": "beat_1_sarah_dodge",
+          "effects": [{"stat": "skepticism", "value": 8}]
+        },
+        {
+          "id": "say_maybe",
+          "text": "Maybe... let me think about it",
+          "next_scene": "beat_1_sarah_fomo",
+          "effects": [{"stat": "stress", "value": 5}]
+        }
+      ]
+    },
+    
+    "beat_2_early_success": {
+      "background": "streamer_room_glow",
+      "music": "success_chime",
+      "dialogue_sequence": [
+        {
+          "speaker": "narrator",
+          "text": "Two weeks later...",
+          "effects": []
+        },
+        {
+          "speaker": "narrator",
+          "text": "Your 'dashboard' shows $50 in commissions!",
+          "effects": [{"stat": "money", "value": 50}]
+        },
+        {
+          "speaker": "hero",
+          "text": "OMG it actually WORKS!",
+          "portrait": "hero_ecstatic",
+          "effects": [{"stat": "confidence", "value": 15}]
+        },
+        {
+          "speaker": "sarah",
+          "text": "See? I told you! Now imagine when you hit DIAMOND rank! 💎",
+          "portrait": "sarah_celebrating",
+          "effects": []
+        },
+        {
+          "speaker": "narrator",
+          "text": "Sarah invites you to a 'team Zoom call.'",
+          "effects": []
+        },
+        {
+          "speaker": "narrator",
+          "text": "15 people on camera. Everyone cheering. Everyone successful.",
+          "effects": []
+        },
+        {
+          "speaker": "diamond_dave",
+          "text": "Who's ready to CRUSH IT this month?!",
+          "portrait": "diamond_dave_hype",
+          "effects": []
+        }
+      ],
+      "choices": [
+        {
+          "id": "recruit_friends",
+          "text": "I'll recruit my friends!",
+          "next_scene": "beat_2_recruitment_push",
+          "effects": [{"stat": "social_credit", "value": -10}, {"stat": "stress", "value": 10}],
+          "set_flag": "tried_recruiting"
+        },
+        {
+          "id": "buy_inventory",
+          "text": "Buy more inventory to hit the next tier",
+          "next_scene": "beat_2_inventory_trap",
+          "effects": [{"stat": "money", "value": -500}, {"stat": "financial_health", "value": -500}]
+        },
+        {
+          "id": "ask_payout",
+          "text": "When can I withdraw my earnings?",
+          "next_scene": "beat_2_withdrawal_delay",
+          "effects": [{"stat": "skepticism", "value": 5}]
+        }
+      ]
+    }
+  }
+}

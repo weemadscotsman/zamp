@@ -1,0 +1,172 @@
+[gd_scene format=3 uid="uid://sharedui2"]
+
+[node name="SharedUI" type="CanvasLayer"]
+layer = 10
+
+[node name="StatBar" type="Panel" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="StatBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_right = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="FollowersLabel" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "👥"
+
+[node name="FollowersValue" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "847"
+
+[node name="Spacer1" type="Control" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RepLabel" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "📊"
+
+[node name="ReputationValue" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "50"
+
+[node name="Spacer2" type="Control" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SkepticLabel" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "🧐"
+
+[node name="SkepticismValue" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "5"
+
+[node name="Spacer3" type="Control" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="StressLabel" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "😰"
+
+[node name="StressValue" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "10"
+
+[node name="Spacer4" type="Control" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EvidenceLabel" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "📄"
+
+[node name="EvidenceValue" type="Label" parent="StatBar/HBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "0"
+
+[node name="PhaseIndicator" type="Label" parent="."]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -70.0
+offset_right = 300.0
+offset_bottom = -45.0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+text = "PHASE: LOADING..."
+
+[node name="DayIndicator" type="Label" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -70.0
+offset_right = -20.0
+offset_bottom = -45.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Day 1/5"
+horizontal_alignment = 2
+
+[node name="DMButton" type="Button" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -100.0
+offset_top = 60.0
+offset_right = -20.0
+offset_bottom = 95.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 16
+text = "💬 (0)"
+
+[node name="SaveIndicator" type="Label" parent="."]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -120.0
+offset_top = 10.0
+offset_right = -20.0
+offset_bottom = 35.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.3, 0.9, 0.3, 1)
+text = "💾 SAVED"
+
+[node name="CRTOverlay" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
+
+[node name="Scanlines" type="TextureRect" parent="CRTOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Vignette" type="ColorRect" parent="CRTOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.3)

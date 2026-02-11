@@ -1,0 +1,279 @@
+[gd_scene load_steps=8 format=3 uid="uid://social2"]
+
+[ext_resource type="Script" path="res://src/scripts/social_media_sim.gd" id="1_social"]
+[ext_resource type="PackedScene" uid="uid://sharedui1" path="res://src/scenes/shared_ui.tscn" id="2_ui"]
+[ext_resource type="PackedScene" uid="uid://transition1" path="res://src/scenes/phase_transition.tscn" id="3_trans"]
+[ext_resource type="PackedScene" uid="uid://vfx1" path="res://src/scenes/visual_effects.tscn" id="4_vfx"]
+[ext_resource type="PackedScene" uid="uid://ambient1" path="res://src/scenes/ambient_effects.tscn" id="5_ambient"]
+[ext_resource type="PackedScene" uid="uid://toast1" path="res://src/scenes/toast_manager.tscn" id="6_toast"]
+[ext_resource type="Script" path="res://src/scripts/cursor_manager.gd" id="7_cursor"]
+
+[node name="SocialMediaSim" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_social")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.05, 0.12, 1)
+
+[node name="SharedUI" parent="." instance=ExtResource("2_ui")]
+
+[node name="MainPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -180.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="MainPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 680.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.9, 0.7, 0.3, 1)
+text = "📱 CREATE POST"
+horizontal_alignment = 1
+
+[node name="PostOptions" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 680.0
+offset_bottom = 320.0
+theme_override_constants/separation = 10
+
+[node name="ResearchButton" type="Button" parent="MainPanel"]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 340.0
+offset_right = 500.0
+offset_bottom = 380.0
+theme_override_font_sizes/font_size = 18
+text = "🔍 OPEN INVESTIGATION DESK"
+
+[node name="DMPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -200.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ContactAvatar" type="ColorRect" parent="DMPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 20.0
+offset_right = 80.0
+offset_bottom = 70.0
+color = Color(1, 0.4, 0.7, 1)
+
+[node name="ContactName" type="Label" parent="DMPanel"]
+layout_mode = 0
+offset_left = 95.0
+offset_top = 25.0
+offset_right = 250.0
+offset_bottom = 65.0
+theme_override_font_sizes/font_size = 24
+text = "SARAH"
+
+[node name="BackButton" type="Button" parent="DMPanel"]
+layout_mode = 0
+offset_left = 580.0
+offset_top = 20.0
+offset_right = 670.0
+offset_bottom = 60.0
+text = "← Back"
+
+[node name="MessageHistory" type="VBoxContainer" parent="DMPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 90.0
+offset_right = 670.0
+offset_bottom = 280.0
+theme_override_constants/separation = 8
+
+[node name="ChoiceButtons" type="VBoxContainer" parent="DMPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 300.0
+offset_right = 670.0
+offset_bottom = 390.0
+theme_override_constants/separation = 8
+
+[node name="ResearchPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -350.0
+offset_top = -200.0
+offset_right = 350.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="ResearchPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 680.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
+text = "🔍 INVESTIGATION DESK"
+horizontal_alignment = 1
+
+[node name="ResearchText" type="RichTextLabel" parent="ResearchPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 680.0
+offset_bottom = 200.0
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+
+[node name="SearchButtons" type="VBoxContainer" parent="ResearchPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 220.0
+offset_right = 400.0
+offset_bottom = 350.0
+theme_override_constants/separation = 10
+
+[node name="CloseResearchButton" type="Button" parent="ResearchPanel"]
+layout_mode = 0
+offset_left = 550.0
+offset_top = 350.0
+offset_right = 680.0
+offset_bottom = 390.0
+text = "Close"
+
+[node name="DayTransitionPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="DayTransitionPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.05, 0.08, 0.95)
+
+[node name="DayText" type="Label" parent="DayTransitionPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -80.0
+offset_right = 150.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+text = "DAY 1"
+horizontal_alignment = 1
+
+[node name="SummaryText" type="Label" parent="DayTransitionPanel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = 0.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 16
+text = "Stats summary..."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ContinueDayButton" type="Button" parent="DayTransitionPanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -100.0
+offset_right = 100.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 18
+text = "Continue →"
+
+[node name="PhaseTransition" parent="." instance=ExtResource("3_trans")]
+
+[node name="VisualEffects" parent="." instance=ExtResource("4_vfx")]
+
+[node name="AmbientEffects" parent="." instance=ExtResource("5_ambient")]
+
+[node name="ToastManager" parent="." instance=ExtResource("6_toast")]
+
+[node name="CursorManager" type="Node" parent="."]
+script = ExtResource("7_cursor")
+
+[node name="NotificationLabel" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_top = 100.0
+offset_right = 300.0
+offset_bottom = 140.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 18
+text = "Notification"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="MainPanel/ResearchButton" to="." method="_on_research_button_pressed"]
+[connection signal="pressed" from="ResearchPanel/CloseResearchButton" to="." method="_on_close_research_pressed"]
+[connection signal="pressed" from="DMPanel/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="DayTransitionPanel/ContinueDayButton" to="." method="_on_continue_day_pressed"]

@@ -1,0 +1,286 @@
+[gd_scene load_steps=4 format=3 uid="uid://invest1"]
+
+[ext_resource type="Script" path="res://src/scripts/investigation_phase.gd" id="1_invest"]
+[ext_resource type="PackedScene" uid="uid://sharedui1" path="res://src/scenes/shared_ui.tscn" id="2_ui"]
+[ext_resource type="PackedScene" uid="uid://transition1" path="res://src/scenes/phase_transition.tscn" id="3_trans"]
+
+[node name="InvestigationPhase" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_invest")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.08, 0.12, 1)
+
+[node name="SharedUI" parent="." instance=ExtResource("2_ui")]
+
+[node name="PhaseTransition" parent="." instance=ExtResource("3_trans")]
+
+[node name="TopBar" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 800.0
+offset_bottom = 60.0
+
+[node name="DayLabel" type="Label" parent="TopBar"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 130.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 18
+text = "📅 Day 1/5"
+
+[node name="StaminaLabel" type="Label" parent="TopBar"]
+layout_mode = 0
+offset_left = 160.0
+offset_top = 15.0
+offset_right = 290.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 16
+text = "⚡ Stamina: 100"
+
+[node name="EvidenceLabel" type="Label" parent="TopBar"]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 15.0
+offset_right = 460.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 16
+text = "📄 Evidence: 0"
+
+[node name="SuspicionLabel" type="Label" parent="TopBar"]
+layout_mode = 0
+offset_left = 490.0
+offset_top = 15.0
+offset_right = 630.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 16
+text = "👁️ Suspicion: 0%"
+
+[node name="StaminaBar" type="ProgressBar" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 70.0
+offset_right = 250.0
+offset_bottom = 85.0
+max_value = 100.0
+value = 100.0
+
+[node name="InvestigationPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 100.0
+offset_right = 750.0
+offset_bottom = 520.0
+
+[node name="TitleLabel" type="Label" parent="InvestigationPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 680.0
+offset_bottom = 50.0
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.3, 0.7, 0.9, 1)
+text = "🔍 INVESTIGATION AREAS"
+
+[node name="AreaList" type="VBoxContainer" parent="InvestigationPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 60.0
+offset_right = 680.0
+offset_bottom = 400.0
+theme_override_constants/separation = 10
+
+[node name="EvidenceButton" type="Button" parent="InvestigationPanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 410.0
+offset_right = 200.0
+offset_bottom = 450.0
+theme_override_font_sizes/font_size = 16
+text = "📋 View Evidence"
+
+[node name="EvidencePanel" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 50.0
+offset_top = 100.0
+offset_right = 750.0
+offset_bottom = 520.0
+
+[node name="EvidenceText" type="RichTextLabel" parent="EvidencePanel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 680.0
+offset_bottom = 350.0
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+
+[node name="CloseEvidenceButton" type="Button" parent="EvidencePanel"]
+layout_mode = 0
+offset_left = 300.0
+offset_top = 400.0
+offset_right = 400.0
+offset_bottom = 440.0
+text = "Close"
+
+[node name="ResultPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResultTitle" type="Label" parent="ResultPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 570.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="ResultText" type="RichTextLabel" parent="ResultPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 90.0
+offset_right = 570.0
+offset_bottom = 200.0
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+
+[node name="ContinueResultButton" type="Button" parent="ResultPanel"]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 230.0
+offset_right = 350.0
+offset_bottom = 270.0
+text = "Continue"
+
+[node name="DayEndPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -150.0
+offset_right = 250.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DaySummary" type="Label" parent="DayEndPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 470.0
+offset_bottom = 200.0
+theme_override_font_sizes/font_size = 16
+text = "Day summary..."
+autowrap_mode = 3
+
+[node name="ContinueDayButton" type="Button" parent="DayEndPanel"]
+layout_mode = 0
+offset_left = 150.0
+offset_top = 220.0
+offset_right = 350.0
+offset_bottom = 260.0
+theme_override_font_sizes/font_size = 18
+text = "Next Day"
+
+[node name="ConnectionPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 100.0
+offset_top = 150.0
+offset_right = 700.0
+offset_bottom = 400.0
+
+[node name="GameOverPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="GameOverPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = 570.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="DescLabel" type="Label" parent="GameOverPanel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 100.0
+offset_right = 570.0
+offset_bottom = 250.0
+theme_override_font_sizes/font_size = 14
+text = "Description"
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="Choice1Button" type="Button" parent="GameOverPanel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 280.0
+offset_right = 280.0
+offset_bottom = 320.0
+theme_override_font_sizes/font_size = 16
+
+[node name="Choice2Button" type="Button" parent="GameOverPanel"]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 280.0
+offset_right = 550.0
+offset_bottom = 320.0
+theme_override_font_sizes/font_size = 16
+
+[node name="StatusLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 530.0
+offset_right = 750.0
+offset_bottom = 560.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+text = "Your investigation begins..."
+horizontal_alignment = 1
+
+[connection signal="pressed" from="InvestigationPanel/EvidenceButton" to="." method="_on_evidence_button_pressed"]
+[connection signal="pressed" from="EvidencePanel/CloseEvidenceButton" to="." method="_on_close_evidence_pressed"]
+[connection signal="pressed" from="ResultPanel/ContinueResultButton" to="." method="_on_continue_result_pressed"]
+[connection signal="pressed" from="DayEndPanel/ContinueDayButton" to="." method="_on_continue_day_pressed"]
