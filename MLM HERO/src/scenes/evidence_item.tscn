@@ -2,6 +2,9 @@
 
 [ext_resource type="Script" path="res://src/scripts/evidence_item.gd" id="1_script"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D"]
+size = Vector2(40, 40)
+
 [node name="EvidenceItem" type="Area2D"]
 script = ExtResource("1_script")
 
@@ -34,6 +37,3 @@ scale_amount_max = 4.0
 color = Color(1, 1, 0.5, 1)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D"]
-size = Vector2(40, 40)
