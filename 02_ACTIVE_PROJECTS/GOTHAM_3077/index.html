@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>GOTHAM 3077 | OMNI-EYE</title>
+    
+    <!-- Polyfill and Global Config -->
+    <script>
+        window.CESIUM_BASE_URL = '/js/';
+        
+        // FORCE UNREGISTER OLD SERVICE WORKERS
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(registration) {
+                    registration.unregister();
+                });
+            });
+        }
+        // Polyfill crypto.randomUUID
+        if (!crypto.randomUUID) {
+            crypto.randomUUID = function() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0;
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });
+            };
+        }
+    </script>
+
+    <!-- SGP4 satellite orbit propagation -->
+    <script src="/js/satellite.min.js"></script>
+
+    <!-- Cesium 3D Globe -->
+    <script src="/js/Cesium.js"></script>
+    <link href="/js/widgets.css" rel="stylesheet">
+
+    <!-- TITAN System Modules -->
+    <script src="/gotham/gotham-utils.js?v=3"></script>
+    <script src="/gotham/gotham-event-bus.js?v=3"></script>
+    <script src="/gotham/gotham-cache.js?v=3"></script>
+    <script src="/gotham/gotham-spatial.js?v=3"></script>
+    <script src="/gotham/gotham-shaders.js?v=3"></script>
+    <script src="/gotham/gotham-hud.js?v=48"></script>
+    <script src="/gotham/gotham-roads.js?v=3"></script>
+    <script src="/gotham/gotham-sector-manager.js?v=3"></script>
+    <script src="/gotham/gotham-world-influence.js?v=3"></script>
+    <script src="/gotham/gotham-agent-bridge.js?v=3"></script>
+    <script src="/gotham/gotham-environment-sampler.js?v=3"></script>
+    <script src="/gotham/gotham-agent-memory.js?v=3"></script>
+    <script src="/gotham/gotham-behavior-graph.js?v=3"></script>
+    <script src="/gotham/gotham-task-system.js?v=3"></script>
+    <script src="/gotham/gotham-world-state.js?v=3"></script>
+    <script src="/gotham/gotham-simulation-engine.js?v=3"></script>
+    <script src="/gotham/gotham-agent-system.js?v=3"></script>
+    <script src="/gotham/gotham-agent-integration.js?v=3"></script>
+    <script src="/gotham/gotham-performance-monitor.js?v=3"></script>
+    <script src="/gotham/gotham-autonomous-kernel.js?v=3"></script>
+    <script src="/gotham/gotham-prediction-engine.js?v=3"></script>
+    <script src="/gotham/gotham-satellite-coverage.js?v=3"></script>
+    <script src="/gotham/gotham-event-engine.js?v=3"></script>
+    <script src="/gotham/gotham-ai-analyst.js?v=3"></script>
+    <script src="/gotham/gotham-tile-engine.js?v=3"></script>
+    <script src="/gotham/gotham-world-streaming.js?v=3"></script>
+    <script src="/gotham/gotham-agent-economy.js?v=3"></script>
+    <script src="/gotham/gotham-navigation-graph.js?v=3"></script>
+    <script src="/gotham/gotham-scenario-engine.js?v=3"></script>
+    <script src="/gotham/gotham-github-marketplace.js?v=3"></script>
+    <script src="/gotham/gotham-viewport.js?v=3"></script>
+    <script src="/gotham/gotham-zoom-manager.js?v=3"></script>
+    <script src="/gotham/gotham-pathfinding.js?v=3"></script>
+    <script src="/gotham/trajectory-fields.js?v=3"></script>
+    <script src="/gotham/gotham-3077-system.js?v=3"></script>
+    <script src="/gotham/worldview-complete.js?v=3"></script>
+
+    <!-- MISSING CORE SYSTEMS - NOW WIRED UP -->
+    <script src="/gotham/gotham-goal-stack.js?v=3"></script>
+    <script src="/gotham/gotham-knowledge-base.js?v=3"></script>
+    <script src="/gotham/gotham-shadowbroker-bridge.js?v=3"></script>
+    <script src="/gotham/gotham-agent-telemetry.js?v=3"></script>
+    <script src="/gotham/gotham-tile-scenarios.js?v=3"></script>
+    <script src="/gotham/worker-data-processor.js?v=3"></script>
+    <script src="/gotham-emotional-engine.js?v=3"></script>
+    <script src="/gotham-nlp-manager.js?v=3"></script>
+    <script src="/gotham-agent-system-upgrade.js?v=3"></script>
+    <script src="/worldview-bridge.js?v=3"></script>
+
+    <!-- Chaos Monitor -->
+    <script src="/chaos-monitor/chaos-monitor.js?v=2"></script>
+    <script src="/chaos-monitor/chaos-cesium-overlay.js?v=2"></script>
+    <script src="/chaos-monitor/alert-dispatcher.js?v=2"></script>
+    <script src="/chaos-monitor/incident-recorder.js?v=2"></script>
+    <script src="/chaos-monitor/scalable-feed-manager.js?v=2"></script>
+    <script src="/chaos-monitor/chaos-init.js?v=2"></script>
+
+    <!-- GOTHAM 3077 BOOT SEQUENCE - CREATES ALL HUD PANELS -->
+    <script src="/gotham/gotham-init.js?v=3.5.1"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: #05080c;
+            font-family: 'Share Tech Mono', 'Courier New', monospace;
+        }
+        
+        #cesiumContainer { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: block !important;
+            visibility: visible !important;
+            background: #000;
+        }
+    
+    .cesium-viewer-bottom, .cesium-viewer-toolbar, .cesium-widget-credits { 
+        display: none !important; 
+    }
+
+    /* Boot Sequence Overlay */
+    #gotham-boot-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: #05080c; z-index: 100000;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: #00f0ff; transition: opacity 1s ease-out;
+    }
+    #boot-content { width: 600px; padding: 40px; border: 1px solid rgba(0,240,255,0.2); background: rgba(0,240,255,0.02); position: relative; }
+    #boot-logo { font-size: 42px; font-weight: bold; letter-spacing: 10px; margin-bottom: 5px; text-shadow: 0 0 20px rgba(0,240,255,0.5); text-align: center; }
+    #boot-sub { font-size: 12px; letter-spacing: 4px; color: #88aaff; margin-bottom: 30px; text-align: center; }
+    #boot-terminal {
+        height: 180px; overflow-y: auto; font-size: 10px; color: #4488aa;
+        line-height: 1.6; border-top: 1px solid rgba(0,240,255,0.1); padding-top: 15px;
+        scrollbar-width: none;
+    }
+    #boot-terminal::-webkit-scrollbar { display: none; }
+    #boot-progress-wrap { width: 100%; height: 2px; background: rgba(0,240,255,0.1); margin-top: 25px; position: relative; }
+    #boot-progress-bar { width: 0%; height: 100%; background: #00f0ff; box-shadow: 0 0 10px #00f0ff; transition: width 0.2s; }
+    .boot-status { position: absolute; right: 0; top: -18px; font-size: 9px; color: #00f0ff; }
+
+    @keyframes scanline { 0% { transform: translateY(-100%) } 100% { transform: translateY(100%) } }
+    .boot-scanline { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(0,240,255,0.05), transparent); pointer-events: none; animation: scanline 4s linear infinite; }
+</style>
+</head>
+<body>
+    <div id="gotham-boot-overlay">
+        <div class="boot-scanline"></div>
+        <div id="boot-content">
+            <div id="boot-logo">GOTHAM 3077</div>
+            <div id="boot-sub">OMNI-EYE TACTICAL KERNEL v3.1</div>
+
+            <div id="boot-terminal">
+                <div>[ SYSTEM ] INITIALIZING KERNEL...</div>
+            </div>
+
+            <div id="boot-progress-wrap">
+                <div id="boot-progress-bar"></div>
+                <div id="boot-status-text" class="boot-status">BOOTING: 0%</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GOTHAM 3077 creates all UI dynamically, but we hardcode the structure for stability -->
+    <div id="cesiumContainer"></div>
+
+    <!-- HUD STRUCTURE -->
+    <div id="gotham-hud-top" class="locked"></div>
+    <div id="gotham-hud-left" class="gotham-sidebar locked"></div>
+    <div id="gotham-hud-right" class="gotham-sidebar locked"></div>
+    <div id="gotham-hud-bottom" class="locked"></div>
+
+    <style>
+      .gotham-sidebar {
+        position: fixed; width: 380px; height: 100vh;
+        background: rgba(3,5,8,0.98); border: 1px solid rgba(0,240,255,0.15);
+        z-index: 9990; backdrop-filter: blur(40px); 
+        font-family: "Share Tech Mono", monospace; color: #e0e0e0; overflow: hidden;
+        display: flex; flex-direction: column; box-shadow: 0 0 100px rgba(0,0,0,1);
+        transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+      }
+      #gotham-hud-left { left: 0; top: 0; border-right: 2px solid #00f0ff; transform: translateX(0); }
+      #gotham-hud-right { right: 0; top: 0; border-left: 2px solid #ff00ff; transform: translateX(0); }
+      #gotham-hud-bottom {
+        position: fixed; bottom: 0; left: 50%; width: 1200px; height: 320px;
+        transform: translate(-50%, 0);
+        background: rgba(3,5,8,0.98); border: 1px solid rgba(0,240,255,0.15);
+        z-index: 9995; backdrop-filter: blur(40px); display: flex; padding: 15px; gap: 20px; border-radius: 12px 12px 0 0;
+      }
+      #gotham-hud-top {
+        position: fixed; top: 0; left: 50%; width: 90%; max-width: 1400px; height: 140px;
+        transform: translate(-50%, 0);
+        background: rgba(3,5,8,0.98); border: 1px solid rgba(0,240,255,0.15);
+        z-index: 9996; backdrop-filter: blur(40px); display: flex; flex-direction: column; border-radius: 0 0 12px 12px;
+      }
+      .panel-content { flex: 1; overflow-y: auto; padding-bottom: 20px; scrollbar-width: thin; }
+      .section-header { color: #00f0ff; font-size: 11px; margin-bottom: 10px; letter-spacing: 4px; border-bottom: 1px solid rgba(0,240,255,0.2); padding-bottom: 4px; font-weight: bold; }
+      .panel-block { padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+      .sub-header { color: #555; font-size: 9px; margin-bottom: 8px; letter-spacing: 2px; text-transform: uppercase; }
+      .btn-toggle { flex: 1; padding: 8px 0; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; color: #666; background: rgba(255,255,255,0.02); font-size: 9px; font-weight: bold; text-align: center; transition: 0.2s; letter-spacing: 1px; }
+      .spectrograph { height: 80px; background: #000; border: 1px solid #333; margin-top: 8px; position: relative; overflow: hidden; }
+      .spectro-bar { position: absolute; bottom: 0; width: 2px; background: linear-gradient(to top, #0f0, #ff0, #f00); }
+      .band-meter { flex: 1; height: 4px; background: #222; margin: 0 8px; position: relative; overflow: hidden; }
+      .band-fill { height: 100%; background: #0f8; width: 0%; transition: width 0.3s; }
+      .intent-graph { height: 60px; background: rgba(0,240,255,0.05); border: 1px solid rgba(0,240,255,0.1); margin-top: 8px; position: relative; overflow: hidden; }
+      .panel-lock-btn { position: absolute; width: 24px; height: 24px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: #888; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; z-index: 1001; }
+    </style>
+
+    <!-- WebSocket Data Connection -->
+    <script>
+        (function() {
+            var reconnectDelay = 2000;
+            var maxDelay = 30000;
+
+            function connect() {
+                var host = window.location.hostname + ":3002";
+                var ws = new WebSocket('ws://' + host);
+
+                ws.onopen = function() {
+                    console.log('[GOTHAM] WebSocket connected');
+                    reconnectDelay = 2000;
+                };
+
+                ws.onmessage = function(e) {
+                      try {
+                          var msg = JSON.parse(e.data);
+                          if (msg.data) {
+                              window.dispatchEvent(new CustomEvent('gotham-data', { detail: msg.data }));
+                          }
+                          if (msg.type === 'agent_command') {
+                              window.dispatchEvent(new CustomEvent('gotham-agent-command', { detail: msg }));
+                          }
+                      } catch (err) {
+                          console.warn('[GOTHAM] Bad message:', err.message);
+                      }
+  };
+
+                ws.onclose = function() {
+                    console.log('[GOTHAM] Reconnecting in ' + (reconnectDelay / 1000) + 's...');
+                    setTimeout(connect, reconnectDelay);
+                    reconnectDelay = Math.min(reconnectDelay * 1.5, maxDelay);
+                };
+
+                ws.onerror = function() {
+                    ws.close();
+                };
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', connect);
+            } else {
+                connect();
+            }
+        })();
+    </script>
+</body>
+</html>
