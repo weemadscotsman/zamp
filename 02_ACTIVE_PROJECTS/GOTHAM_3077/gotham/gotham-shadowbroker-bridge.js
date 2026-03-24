@@ -113,25 +113,49 @@ class ShadowBrokerBridge {
   async _fetchFastData(viewport = null) {
     if (this._isLoading) return;
     this._isLoading = true;
-    
+
     try {
+      // Try Python backend endpoint first
       let url = this.FAST_ENDPOINT;
       if (viewport) {
         url += `?s=${viewport.s.toFixed(4)}&w=${viewport.w.toFixed(4)}&n=${viewport.n.toFixed(4)}&e=${viewport.e.toFixed(4)}`;
       }
-      
+
       const response = await fetch(url, {
         headers: { 'Accept': 'application/json' },
         signal: AbortSignal.timeout(10000)
       });
-      
+
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
+
       const data = await response.json();
       this._processFastData(data);
-      
+
     } catch (err) {
-      console.warn('[SHADOWBROKER] Fast data fetch failed:', err.message);
+      console.warn('[SHADOWBROKER] Fast data fetch failed, using bbox fallback:', err.message);
+      // Fallback: use server.cjs /api/bbox which has ALL data from DataStore
+      try {
+        const vp = viewport || this._getViewportBounds();
+        if (vp) {
+          const bboxUrl = `/api/bbox?west=${vp.w.toFixed(4)}&south=${vp.s.toFixed(4)}&east=${vp.e.toFixed(4)}&north=${vp.n.toFixed(4)}&zoom=5`;
+          const fallbackRes = await fetch(bboxUrl, { signal: AbortSignal.timeout(8000) });
+          if (fallbackRes.ok) {
+            const data = await fallbackRes.json();
+            this._dispatchToEntitySystem(data);
+            console.log('[SHADOWBROKER] Bbox fallback delivered data');
+          }
+        } else {
+          // No viewport yet - fetch full snapshot
+          const fallbackRes = await fetch('/api/data', { signal: AbortSignal.timeout(8000) });
+          if (fallbackRes.ok) {
+            const data = await fallbackRes.json();
+            this._dispatchToEntitySystem(data);
+            console.log('[SHADOWBROKER] Full snapshot fallback delivered data');
+          }
+        }
+      } catch (fallbackErr) {
+        console.warn('[SHADOWBROKER] Fallback also failed:', fallbackErr.message);
+      }
     } finally {
       this._isLoading = false;
     }
@@ -144,35 +168,61 @@ class ShadowBrokerBridge {
       if (viewport) {
         url += `?s=${viewport.s.toFixed(4)}&w=${viewport.w.toFixed(4)}&n=${viewport.n.toFixed(4)}&e=${viewport.e.toFixed(4)}`;
       }
-      
+
       const response = await fetch(url, {
         headers: { 'Accept': 'application/json' },
         signal: AbortSignal.timeout(15000)
       });
-      
+
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
+
       const data = await response.json();
       this._processSlowData(data);
-      
+
     } catch (err) {
-      console.warn('[SHADOWBROKER] Slow data fetch failed:', err.message);
+      console.warn('[SHADOWBROKER] Slow data fetch failed, using bbox fallback:', err.message);
+      // Fallback: use server.cjs /api/bbox
+      try {
+        const vp = this._getViewportBounds();
+        if (vp) {
+          const bboxUrl = `/api/bbox?west=${vp.w.toFixed(4)}&south=${vp.s.toFixed(4)}&east=${vp.e.toFixed(4)}&north=${vp.n.toFixed(4)}&zoom=5`;
+          const fallbackRes = await fetch(bboxUrl, { signal: AbortSignal.timeout(8000) });
+          if (fallbackRes.ok) {
+            const data = await fallbackRes.json();
+            this._dispatchToEntitySystem(data);
+            console.log('[SHADOWBROKER] Slow bbox fallback delivered data');
+          }
+        }
+      } catch (fallbackErr) {
+        console.warn('[SHADOWBROKER] Slow fallback also failed:', fallbackErr.message);
+      }
     }
   }
 
   _processFastData(data) {
     if (!data || !this.entitySystem) return;
-    
+
     // Map backend keys to frontend data keys
     const mapped = {
-      flights: data.commercial_flights || [],
+      flights: [...(data.commercial_flights || []), ...(data.private_flights || []), ...(data.private_jets || [])],
       military: data.military_flights || [],
       ships: data.ships || [],
       cctv: data.cctv || [],
       satellites: data.satellites || [],
-      uavs: data.uavs || []
+      transit: data.transit || [],
+      neos: data.neos || [],
+      stars: data.stars || [],
+      meteors: data.meteors || [],
+      aliens: [...(data.ufo_sightings || []), ...(data.alien_activity || [])],
+      gps_jamming: data.gps_jamming || [],
+      traffic: data.traffic || []
     };
-    
+
+    // Add UAVs to military
+    if (data.uavs && data.uavs.length > 0) {
+      mapped.military = [...mapped.military, ...data.uavs];
+    }
+
     // Add tracked flights if present
     if (data.tracked_flights && data.tracked_flights.length > 0) {
       mapped.tracked_flights = data.tracked_flights;
@@ -191,21 +241,29 @@ class ShadowBrokerBridge {
 
   _processSlowData(data) {
     if (!data || !this.entitySystem) return;
-    
+
     // Map backend keys to frontend data keys
+    // NOTE: Entity system _updateLayers expects specific key names
     const mapped = {
       news: data.news || [],
       stocks: data.stocks ? [data.stocks] : [],
       oil: data.oil ? [data.oil] : [],
       earthquakes: data.earthquakes || [],
-      frontlines: data.frontlines ? [data.frontlines] : [],
-      gdelt: data.gdelt || [],
+      frontlines: data.frontlines ? (Array.isArray(data.frontlines) ? data.frontlines : [data.frontlines]) : [],
+      gdacs: data.gdacs || data.gdelt || [],
       kiwisdr: data.kiwisdr || [],
       internet_outages: data.internet_outages || [],
-      firms_fires: data.firms_fires || [],
+      wildfires: data.firms_fires || data.wildfires || [],
       datacenters: data.datacenters || [],
       military_bases: data.military_bases || [],
-      power_plants: data.power_plants || []
+      power_plants: data.power_plants || [],
+      weather: Array.isArray(data.weather) ? data.weather : (data.weather ? [data.weather] : []),
+      spacewx: Array.isArray(data.space_weather) ? data.space_weather : (data.space_weather ? [data.space_weather] : []),
+      neos: data.neos || [],
+      stars: data.stars || [],
+      meteors: data.meteors || [],
+      traffic: data.traffic || [],
+      aliens: data.aliens || data.ufo_sightings || []
     };
     
     // Dispatch to entity system

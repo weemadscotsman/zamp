@@ -323,6 +323,22 @@
     }
     await wait(600);
 
+    // STAGE 8b: ACCOUNTABILITY ENGINE (Public Cameras + UFO Tracking)
+    log('ACTIVATING ACCOUNTABILITY ENGINE...');
+    speak('Activating accountability engine.');
+    if (typeof accountabilityEngine !== 'undefined' && viewer && window.gothamHUD) {
+      try {
+        window.gothamAccountability = new accountabilityEngine(viewer, window.gothamHUD);
+        await window.gothamAccountability.init();
+        log('ACCOUNTABILITY ENGINE ONLINE', '#0f8');
+        speak('Public camera and UFO tracking active.');
+      } catch (e) {
+        log('ACCOUNTABILITY PARTIAL', '#f80');
+        console.error(e);
+      }
+    }
+    await wait(400);
+
     // STAGE 8a.5: ROAD NETWORK
     log('INITIALIZING ROAD NETWORK...');
     speak('Initializing road network.');
@@ -525,6 +541,31 @@
         }
       }
     });
+
+    // Flush any buffered WebSocket data that arrived before we were ready
+    if (window._gothamFlushDataBuffer) {
+      console.log('[GOTHAM] Flushing buffered WebSocket data...');
+      window._gothamFlushDataBuffer();
+    }
+
+    // Data flows via WebSocket in index.html → gotham-data event → _updateLayers
+    // Also trigger initial viewport fetch + periodic polling as backup
+    if (gothamSystem && gothamSystem._fetchViewportData) {
+      setTimeout(() => {
+        console.log('[GOTHAM] Initial viewport data fetch');
+        gothamSystem._fetchViewportData();
+      }, 3000);
+
+      // Periodic fallback poll every 30s
+      setInterval(() => {
+        if (gothamSystem && !gothamSystem._isDestroyed) {
+          gothamSystem._fetchViewportData();
+        }
+      }, 30000);
+    }
+
+
+
     log('UPLINK STABLE', '#0f8');
     setProgress(95, 'COMMS');
     await wait(800);

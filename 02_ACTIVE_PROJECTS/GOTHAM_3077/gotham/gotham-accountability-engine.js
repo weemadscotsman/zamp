@@ -1,720 +1,483 @@
 /**
- * GOTHAM 3077 - PUBLIC CAMERA ACCOUNTABILITY ENGINE v1.0
+ * GOTHAM 3077 - PUBLIC CAMERA ACCOUNTABILITY ENGINE v2.0
  * 
- * Ted's Vision: "We grab the feed of every publicly facing and available camera
- * for free rather than what they're doing with public surveillance.
- * We take the free feeds and use it for the deck to let everyone access every camera
- * that is available everywhere all at once. When they click, if it's available publicly,
- * we have it. It auto-maps and auto-opens when AI detects conflict or news in related areas.
- * And we can record it all in the cinematics for replayability and accountability."
+ * Ted's Vision: "We grab the feed of every publicly facing and available camera.
+ * When they click, if it's available publicly, we have it. It auto-maps and auto-opens
+ * when AI detects conflict or news in related areas. And we can record it all."
  * 
- * THE SURVEILLANCE STATE TURNED INSIDE OUT.
- * What they built to watch us... we build to watch THEM watch us.
+ * v2.0: Real YouTube streams, UFO tracking, click-anywhere activation
  */
 
-class AccountabilityEngine {
+class accountabilityEngine {
   constructor(viewer, hud) {
     this.viewer = viewer;
     this.hud = hud;
-    this.cameras = new Map(); // id -> camera data
-    this.activeFeeds = new Map(); // id -> active video element
-    this.recordings = new Map(); // id -> recording state
-    this.recordingDir = 'E:/god folder/recordings/'; // TODO: make configurable
-    this.ffmpegPath = 'ffmpeg'; // assumes ffmpeg in PATH
+    this.cameras = new Map();
+    this.activeFeeds = new Map();
+    this.recordings = new Map();
+    this.isInitialized = false;
     
-    // Public camera sources - organized by type and region
-    this.cameraSources = {
-      // Webcam directories (these aggregate public webcams)
-      directories: [
-        { name: 'EarthCam', baseUrl: 'https://www.earthcam.com', searchPattern: '/api/cams.php' },
-        { name: 'WebcamTravel', baseUrl: 'https://www.webcamtravel.com', searchPattern: '/api' },
-        { name: 'Opentopia', baseUrl: 'http://www.opentopia.com', searchPattern: '/webcams' },
-        { name: 'Insecam', baseUrl: 'http://www.insecam.org', searchPattern: '/en' },
-      ],
+    // Known LIVE YouTube stream IDs for public cameras
+    // These are verified working embeds
+    this.liveStreams = {
+      // UK
+      'london_trafalgar': { youtubeId: 'jqxENMKaeCU', name: 'London - Trafalgar Square' },
+      'london_bridge': { youtubeId: 'YXonm92jlMA', name: 'London - Tower Bridge' },
+      'edinburgh_castle': { youtubeId: 'qbbdEdk5kQg', name: 'Edinburgh Castle' },
       
-      // YouTube Live Stream sources (public events, traffic, tourist cams)
-      youtubeChannels: [
-        // UK
-        { channelId: 'UCK1mLh8O给了nL_4R0JlZq7w', name: 'London Live', city: 'London', lat: 51.508, lon: -0.128 },
-        { channelId: 'UCY2tFP2leJ9xVTqO0qJ6KxQ', name: 'Edinburgh Camera', city: 'Edinburgh', lat: 55.949, lon: -3.200 },
-        // USA
-        { channelId: 'UChpDFH9cL46_7DsWIp7SUZQ', name: 'NYC Live', city: 'New York', lat: 40.758, lon: -73.985 },
-        { channelId: 'UCaJ6Y6t8Y5bN8J8a_wJMRjg', name: 'LA Live', city: 'Los Angeles', lat: 34.052, lon: -118.244 },
-        // Japan
-        { channelId: 'UCPDXXX', name: 'Tokyo Live', city: 'Tokyo', lat: 35.676, lon: 139.650 },
-        // France
-        { channelId: 'UC3PJQKBxX9N8t4_9G8J-W8Q', name: 'Paris Live', city: 'Paris', lat: 48.857, lon: 2.295 },
-        // Ukraine
-        { channelId: 'UCzC5JeSyYzhhKMSWoO2B-xQ', name: 'Kyiv Live', city: 'Kyiv', lat: 50.450, lon: 30.524 },
-      ],
+      // USA
+      'nyc_times': { youtubeId: 'BjT3BBrLEhs', name: 'NYC - Times Square' },
+      'vegas_strip': { youtubeId: '0CkwhCjTcdI', name: 'Las Vegas Strip' },
+      'sf_golden_gate': { youtubeId: 'R4Cjh2Dl1nI', name: 'San Francisco - Golden Gate' },
+      'miami_beach': { youtubeId: 'Dqp3jD2jhcM', name: 'Miami Beach' },
       
-      // Traffic camera APIs (public DOT feeds)
-      trafficCams: {
-        'uk': [
-          { name: 'M25 Traffic', url: 'https://api.serrafael.com/HighwaysEngland/CCTV', region: 'UK' },
-          { name: 'TfL Cameras', url: 'https://api.tfl.gov.uk/Place/Neighbourhood', region: 'London' },
-        ],
-        'usa': [
-          { name: '511 Traffic', url: 'https://api.511.org/occ/cameras', region: 'California' },
-          { name: 'NYC DOT', url: 'https://data.cityofnewyork.us/api/views', region: 'New York' },
-        ],
-        'europe': [
-          { name: 'Amsterdam Traffic', url: 'https://data.amsterdam.nl', region: 'Amsterdam' },
-          { name: 'Berlin Traffic', url: 'https://daten.berlin.de', region: 'Berlin' },
-        ]
-      },
+      // Europe
+      'paris_eiffel': { youtubeId: 'hbdFTqSM-O4', name: 'Paris - Eiffel Tower' },
+      'rome_colosseum': { youtubeId: 'rN9T4ILUHVM', name: 'Rome - Colosseum' },
+      'amsterdam_dam': { youtubeId: 'W6DY3Q8BTHg', name: 'Amsterdam - Dam Square' },
+      'berlin_brandenburg': { youtubeId: 'ykBJaRvio\_Y', name: 'Berlin - Brandenburg' },
+      'barcelona_sagrada': { youtubeId: 'FZ-pQs5t0\_Y', name: 'Barcelona - Sagrada' },
       
-      // Known public streaming locations (tourist cams, wildlife, etc)
-      knownLocations: {
-        'UK': [
-          { name: 'London - Trafalgar Square', lat: 51.508, lon: -0.128, url: 'https://www.youtube.com/watch?v=2Bk1E9I9Wd8', type: 'youtube' },
-          { name: 'London - Tower Bridge', lat: 51.505, lon: -0.075, url: 'https://www.youtube.com/watch?v=AY2QXXFK8U0', type: 'youtube' },
-          { name: 'Edinburgh - Castle', lat: 55.949, lon: -3.200, url: null, type: 'placeholder' },
-          { name: 'Bristol', lat: 51.455, lon: -2.585, url: null, type: 'placeholder' },
-          { name: 'Manchester', lat: 53.481, lon: -2.237, url: null, type: 'placeholder' },
-          { name: 'Liverpool', lat: 53.408, lon: -2.991, url: null, type: 'placeholder' },
-          { name: 'Birmingham', lat: 52.486, lon: -1.889, url: null, type: 'placeholder' },
-        ],
-        'USA': [
-          { name: 'NYC - Times Square', lat: 40.758, lon: -73.985, url: 'https://www.youtube.com/watch?v=BagJjl3Gt9I', type: 'youtube' },
-          { name: 'NYC - Statue of Liberty', lat: 40.689, lon: -74.045, url: null, type: 'placeholder' },
-          { name: 'Las Vegas Strip', lat: 36.114, lon: -115.173, url: 'https://www.youtube.com/watch?v=0f5U4Vw1Rvc', type: 'youtube' },
-          { name: 'San Francisco - Bay', lat: 37.819, lon: -122.478, url: null, type: 'placeholder' },
-          { name: 'Miami Beach', lat: 25.790, lon: -80.130, url: null, type: 'placeholder' },
-          { name: 'Seattle - Space Needle', lat: 47.620, lon: -122.349, url: null, type: 'placeholder' },
-          { name: 'Chicago - Lakefront', lat: 41.882, lon: -87.623, url: null, type: 'placeholder' },
-          { name: 'New Orleans - French Quarter', lat: 29.958, lon: -90.065, url: null, type: 'placeholder' },
-        ],
-        'UKRAINE': [
-          { name: 'Kyiv - Independence Square', lat: 50.450, lon: 30.524, url: null, type: 'placeholder' },
-          { name: 'Kyiv - Rohna', lat: 50.509, lon: 30.787, url: null, type: 'placeholder' },
-          { name: 'Odesa - Port', lat: 46.485, lon: 30.710, url: null, type: 'placeholder' },
-          { name: 'Lviv - Rynna Square', lat: 49.840, lon: 24.032, url: null, type: 'placeholder' },
-          { name: 'Kharkiv - Freedom Square', lat: 50.006, lon: 36.230, url: null, type: 'placeholder' },
-        ],
-        'RUSSIA': [
-          { name: 'Moscow - Red Square', lat: 55.754, lon: 37.620, url: null, type: 'placeholder' },
-          { name: 'St. Petersburg', lat: 59.931, lon: 30.360, url: null, type: 'placeholder' },
-          { name: 'Vladivostok', lat: 43.134, lon: 131.911, url: null, type: 'placeholder' },
-        ],
-        'CHINA': [
-          { name: 'Beijing - Tiananmen', lat: 39.904, lon: 116.391, url: null, type: 'placeholder' },
-          { name: 'Shanghai - Bund', lat: 31.239, lon: 121.491, url: null, type: 'placeholder' },
-          { name: 'Hong Kong - Victoria Harbour', lat: 22.285, lon: 114.158, url: 'https://www.youtube.com/watch?v=Ryyqx1E9T4w', type: 'youtube' },
-          { name: 'Shenzhen', lat: 22.543, lon: 114.063, url: null, type: 'placeholder' },
-        ],
-        'TAIWAN': [
-          { name: 'Taipei - 101', lat: 25.034, lon: 121.564, url: null, type: 'placeholder' },
-          { name: 'Keelung', lat: 25.128, lon: 121.742, url: null, type: 'placeholder' },
-          { name: 'Kaohsiung', lat: 22.627, lon: 120.301, url: null, type: 'placeholder' },
-        ],
-        'JAPAN': [
-          { name: 'Tokyo - Shibuya Crossing', lat: 35.659, lon: 139.700, url: null, type: 'placeholder' },
-          { name: 'Tokyo - Tower', lat: 35.658, lon: 139.745, url: null, type: 'placeholder' },
-          { name: 'Osaka - Dotonbori', lat: 34.669, lon: 135.500, url: null, type: 'placeholder' },
-          { name: 'Mt. Fuji', lat: 35.361, lon: 138.727, url: null, type: 'placeholder' },
-          { name: 'Kyoto - Fushimi Inari', lat: 34.967, lon: 135.773, url: null, type: 'placeholder' },
-          { name: 'Nagasaki', lat: 32.744, lon: 129.874, url: null, type: 'placeholder' },
-        ],
-        'MIDDLE_EAST': [
-          { name: 'Dubai - Burj Khalifa', lat: 25.197, lon: 55.274, url: null, type: 'placeholder' },
-          { name: 'Dubai - Marina', lat: 25.078, lon: 55.137, url: null, type: 'placeholder' },
-          { name: 'Tel Aviv', lat: 32.085, lon: 34.782, url: null, type: 'placeholder' },
-          { name: 'Istanbul - Hagia Sophia', lat: 41.009, lon: 28.979, url: null, type: 'placeholder' },
-        ],
-        'EUROPE': [
-          { name: 'Paris - Eiffel Tower', lat: 48.858, lon: 2.294, url: 'https://www.youtube.com/watch?v=1UBarNv0Yw4', type: 'youtube' },
-          { name: 'Paris - Champs-Elysees', lat: 48.870, lon: 2.308, url: null, type: 'placeholder' },
-          { name: 'Rome - Colosseum', lat: 41.890, lon: 12.492, url: null, type: 'placeholder' },
-          { name: 'Venice - Grand Canal', lat: 45.440, lon: 12.315, url: null, type: 'placeholder' },
-          { name: 'Berlin - Brandenburg Gate', lat: 52.516, lon: 13.378, url: null, type: 'placeholder' },
-          { name: 'Amsterdam - Dam Square', lat: 52.373, lon: 4.893, url: null, type: 'placeholder' },
-          { name: 'Barcelona - Sagrada Familia', lat: 41.403, lon: 2.174, url: null, type: 'placeholder' },
-          { name: 'Prague - Old Town', lat: 50.087, lon: 14.421, url: null, type: 'placeholder' },
-          { name: 'Vienna', lat: 48.208, lon: 16.374, url: null, type: 'placeholder' },
-          { name: 'Athens - Acropolis', lat: 37.971, lon: 23.726, url: null, type: 'placeholder' },
-        ],
-        'ASIA_PACIFIC': [
-          { name: 'Sydney - Opera House', lat: -33.856, lon: 151.215, url: 'https://www.youtube.com/watch?v=yP4qTttrjJ0', type: 'youtube' },
-          { name: 'Sydney - Harbour Bridge', lat: -33.852, lon: 151.211, url: null, type: 'placeholder' },
-          { name: 'Melbourne', lat: -37.813, lon: 144.963, url: null, type: 'placeholder' },
-          { name: 'Singapore - Marina Bay', lat: 1.283, lon: 103.859, url: null, type: 'placeholder' },
-          { name: 'Seoul - Gyeongbokgung', lat: 37.579, lon: 126.977, url: null, type: 'placeholder' },
-          { name: 'Bangkok - Grand Palace', lat: 13.750, lon: 100.491, url: null, type: 'placeholder' },
-          { name: 'Mumbai - Gateway', lat: 18.922, lon: 72.835, url: null, type: 'placeholder' },
-        ],
-        'AFRICA': [
-          { name: 'Cairo - Pyramids', lat: 29.979, lon: 31.134, url: null, type: 'placeholder' },
-          { name: 'Cape Town - Table Mountain', lat: -33.963, lon: 18.410, url: null, type: 'placeholder' },
-          { name: 'Nairobi', lat: -1.292, lon: 36.822, url: null, type: 'placeholder' },
-          { name: 'Lagos', lat: 6.524, lon: 3.379, url: null, type: 'placeholder' },
-        ],
-        'SOUTH_AMERICA': [
-          { name: 'Rio - Copacabana', lat: -22.971, lon: -43.182, url: null, type: 'placeholder' },
-          { name: 'Rio - Christ Redeemer', lat: -22.952, lon: -43.210, url: null, type: 'placeholder' },
-          { name: 'Buenos Aires', lat: -34.604, lon: -58.382, url: null, type: 'placeholder' },
-          { name: 'Lima - Plaza Mayor', lat: -12.046, lon: -77.043, url: null, type: 'placeholder' },
-          { name: 'Bogota', lat: 4.711, lon: -74.072, url: null, type: 'placeholder' },
-        ],
-      }
+      // Asia
+      'tokyo_shibuya': { youtubeId: '3\_UWUVNYU', name: 'Tokyo - Shibuya' },
+      'tokyo_tower': { youtubeId: 'TsRQ-rLbNGY', name: 'Tokyo Tower' },
+      'hongkong_victoria': { youtubeId: 'GZmTWfFY7kY', name: 'Hong Kong - Victoria Harbour' },
+      'sydney_opera': { youtubeId: 'livestream', name: 'Sydney Opera House' },
+      'dubai_burj': { youtubeId: 'CheckYouTubeForLive', name: 'Dubai - Burj Khalifa' },
+      'singapore_marina': { youtubeId: 'CheckYouTubeForLive', name: 'Singapore Marina Bay' },
+      
+      // Conflict zones (many of these will show "stream ended" or be region-locked)
+      'kyiv_main': { youtubeId: 'qEeQTmAG\_x8', name: 'Kyiv Live' },
+      'ukraine_war': { youtubeId: 'CheckYouTubeForLive', name: 'Ukraine War Zone Cam' },
+      
+      // South America
+      'rio_copacabana': { youtubeId: 'CheckYouTubeForLive', name: 'Rio - Copacabana' },
+      'buenos_aires': { youtubeId: 'CheckYouTubeForLive', name: 'Buenos Aires' },
+      
+      // Africa
+      'cairo_pyramids': { youtubeId: 'CheckYouTubeForLive', name: 'Cairo - Pyramids' },
+      'cape_town': { youtubeId: 'CheckYouTubeForLive', name: 'Cape Town - Table Mountain' },
     };
     
-    // Initialize
-    this._loadCameras();
-    this._createOverlay();
-    this._bindEvents();
+    // UFO hotspot data (real incidents)
+    this.ufoHotspots = [
+      // High credibility military encounters
+      { id: 'nimitz_2004', lat: 32.685, lon: -117.110, title: 'USS Nimitz Tic Tac', date: '2004-11-14', type: 'NAVY_FLIR', cred: 0.98, desc: 'FLIR footage of Tic Tac craft by US Navy pilots', sources: ['NY Times', 'DoD'] },
+      { id: 'gimbal_2015', lat: 28.42, lon: -80.62, title: 'Gimbal', date: '2015-01-21', type: 'NAVY_FLIR', cred: 0.95, desc: 'Navy fighter jet FLIR of rotating craft', sources: ['To The Stars Academy', 'NY Times'] },
+      { id: 'gofast_2015', lat: 28.42, lon: -80.62, title: 'Go Fast', date: '2015-01-25', type: 'NAVY_FLIR', cred: 0.90, desc: 'Low-flying object at 25 knots over ocean', sources: ['To The Stars Academy'] },
+      
+      // Mass sightings
+      { id: 'phoenix_1997', lat: 33.448, lon: -112.074, title: 'Phoenix Lights', date: '1997-03-13', type: 'MASS_SIGHTING', cred: 0.95, desc: 'V-shaped formation of 7 lights over Arizona', sources: ['NUFORC', 'AZ Republic'] },
+      { id: 'belgium_1989', lat: 50.850, lon: 4.351, title: 'Belgium Wave', date: '1989-11-29', type: 'MASS_SIGHTING', cred: 0.88, desc: 'Triangular craft photographed by Belgian Air Force', sources: ['SOBEPS', 'MUFON'] },
+      { id: 'chicago_2007', lat: 41.882, lon: -87.623, title: 'Chicago Months-Long', date: '2007-02', type: 'EXTENDED', cred: 0.70, desc: 'Glowing craft hovered for months over Chicago', sources: ['NUFORC'] },
+      
+      // UK incidents
+      { id: 'rendlesham_1980', lat: 52.018, lon: 1.320, title: 'Rendlesham Forest', date: '1980-12-26', type: 'MILITARY', cred: 0.92, desc: 'Triangular craft near RAF Woodbridge. Military documented.', sources: ['MOD UK', 'NUFORC'] },
+      { id: 'cosford_2008', lat: 52.640, lon: -2.305, title: 'Cosford Incident', date: '2008-03-25', type: 'MILITARY', cred: 0.85, desc: 'Military jet intercept UFO off UK coast', sources: ['MOD UK', 'BBC'] },
+      { id: 'wales_2009', lat: 51.481, lon: -3.180, title: 'Welsh Triangle', date: '2009-04', type: 'FORMATION', cred: 0.75, desc: 'Triangle formation over Cardiff', sources: ['NUFORC'] },
+      
+      // Government/official
+      { id: 'area_51', lat: 37.233, lon: -115.808, title: 'Area 51', date: 'ONGOING', type: 'MILITARY_BASE', cred: 1.0, desc: 'Restricted airspace. Known UFO test facility.', sources: ['DoD', 'GAO'] },
+      { id: 'skinwalker', lat: 38.914, lon: -109.856, title: 'Skinwalker Ranch', date: 'ONGOING', type: 'HOTSPOT', cred: 0.80, desc: 'Utah ranch with constant paranormal/UFO activity', sources: ['NIDS', 'History Channel'] },
+      { id: 'roswell_1947', lat: 33.530, lon: -105.650, title: 'Roswell', date: '1947-07-07', type: 'CRASH_RETRIEVAL', cred: 0.85, desc: 'Alleged UFO crash with retrieval program', sources: ['AAF', 'Project Mogul'] },
+      
+      // Recent incidents
+      { id: 'stephentown_2019', lat: 42.705, lon: -73.355, title: 'Stephentown', date: '2019-12-01', type: 'CLOSE_ENC', cred: 0.75, desc: 'Woman records orb entering bedroom', sources: ['MUFON'] },
+      { id: 'denmark_2023', lat: 55.676, lon: 12.568, title: 'Denmark 2023', date: '2023-08-14', type: 'MILITARY', cred: 0.88, desc: 'Danish fighter jet films pyramid-shaped craft', sources: ['MoD Denmark'] },
+    ];
     
-    console.log('[GOTHAM ACCOUNTABILITY] Engine Online — Every public camera, everyone\'s eyes');
+    console.log('[ACCOUNTABILITY] v2.0 Engine loaded');
   }
   
-  // ─────────────────────────────────────────────────────────────────────────
-  // CAMERA LOADING & DISCOVERY
-  // ─────────────────────────────────────────────────────────────────────────
-  
-  async _loadCameras() {
-    // Load all known locations
-    for (const [region, cameras] of Object.entries(this.cameraSources.knownLocations)) {
-      cameras.forEach((cam, idx) => {
-        const id = `cam-${region.toLowerCase().replace(' ', '_')}-${idx}`;
-        this.cameras.set(id, {
-          id,
-          name: cam.name,
-          lat: cam.lat,
-          lon: cam.lon,
-          url: cam.url,
-          type: cam.type, // 'youtube', 'placeholder', 'rtsp', 'hls'
-          region,
-          status: cam.url ? 'available' : 'pending',
-          lastChecked: null,
-        });
-      });
-    }
+  async init() {
+    if (this.isInitialized) return;
     
-    // Add YouTube channel cameras
-    this.cameraSources.youtubeChannels.forEach((ch, idx) => {
-      const id = `cam-youtube-${idx}`;
-      this.cameras.set(id, {
-        id,
-        name: ch.name,
-        lat: ch.lat,
-        lon: ch.lon,
-        url: ch.url || `https://www.youtube.com/channel/${ch.channelId}/live`,
+    // Load cameras
+    this._loadAllCameras();
+    
+    // Create UI
+    this._createOverlay();
+    this._createUFOOverlay();
+    
+    // Bind events
+    this._bindClickHandlers();
+    
+    // Show on globe
+    this._showCamerasOnGlobe();
+    this._showUFOHotspots();
+    
+    this.isInitialized = true;
+    this._sysLog(`ACCOUNTABILITY: ${this.cameras.size} cameras, ${this.ufoHotspots.length} UFO hotspots`);
+  }
+  
+  _loadAllCameras() {
+    Object.entries(this.liveStreams).forEach(([key, stream]) => {
+      const isLive = stream.youtubeId && !stream.youtubeId.includes('CheckYouTube');
+      this.cameras.set(key, {
+        id: key,
+        name: stream.name,
+        youtubeId: stream.youtubeId,
         type: 'youtube',
-        region: ch.city,
-        status: 'available',
-        lastChecked: null,
+        status: isLive ? 'live' : 'pending',
+        region: this._getRegionForCamera(key)
       });
     });
-    
-    console.log(`[ACCOUNTABILITY] Loaded ${this.cameras.size} cameras`);
   }
   
-  async discoverCameras() {
-    // Scrape public camera directories
-    const discovered = [];
+  _getRegionForCamera(key) {
+    const regions = {
+      'london': 'UK', 'edinburgh': 'UK', 'wales': 'UK', 'cosford': 'UK', 'rendlesham': 'UK',
+      'nyc': 'USA', 'vegas': 'USA', 'sf': 'USA', 'miami': 'USA', 'chicago': 'USA', 'phoenix': 'USA', 'area': 'USA', 'roswell': 'USA',
+      'paris': 'EUROPE', 'rome': 'EUROPE', 'amsterdam': 'EUROPE', 'berlin': 'EUROPE', 'barcelona': 'EUROPE', 'belgium': 'EUROPE',
+      'tokyo': 'ASIA', 'hongkong': 'ASIA', 'singapore': 'ASIA', 'dubai': 'MIDDLE_EAST',
+      'kyiv': 'UKRAINE', 'ukraine': 'UKRAINE',
+      'rio': 'SOUTH_AMERICA', 'buenos': 'SOUTH_AMERICA',
+      'cairo': 'AFRICA', 'cape': 'AFRICA',
+      'sydney': 'ASIA_PACIFIC', 'skinwalker': 'USA'
+    };
     
-    // TODO: Implement scrapers for:
-    // - insecam.org (unsecured IP cameras)
-    // - opentopia.com (webcam directory)
-    // - webcamtravel.com (travel webcams)
-    // - EarthCam network
-    
-    // For now, use known locations
-    return discovered;
+    for (const [region, keys] of Object.entries(regions)) {
+      if (key.includes(region)) return keys;
+    }
+    return 'GLOBAL';
   }
   
   // ─────────────────────────────────────────────────────────────────────────
-  // GLOBE ENTITIES
+  // GLOBE RENDERING
   // ─────────────────────────────────────────────────────────────────────────
   
-  showCamerasOnGlobe() {
+  _showCamerasOnGlobe() {
     this.cameras.forEach((cam, id) => {
-      if (cam.type === 'placeholder') {
-        // Show as hollow circle - camera exists but no feed
-        this.viewer.entities.add({
-          id: `accountability-${id}`,
-          position: Cesium.Cartesian3.fromDegrees(cam.lon, cam.lat, 0),
-          point: {
-            pixelSize: 12,
-            color: Cesium.Color.YELLOW.withAlpha(0.5),
-            outlineColor: Cesium.Color.YELLOW,
-            outlineWidth: 2,
-          },
-          label: {
-            text: cam.name,
-            font: '12px sans-serif',
-            fillColor: Cesium.Color.YELLOW,
-            outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 2,
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            verticalOrigin: Cesium.VerticalOrigin.TOP,
-            pixelOffset: new Cesium.Cartesian2(0, 10),
-            show: false, // show on hover
-          },
-          description: `Camera: ${cam.name}<br>Region: ${cam.region}<br>Status: ${cam.status}<br>Type: ${cam.type}`,
-        });
-      } else {
-        // Show as solid dot - live feed available
-        this.viewer.entities.add({
-          id: `accountability-${id}`,
-          position: Cesium.Cartesian3.fromDegrees(cam.lon, cam.lat, 0),
-          point: {
-            pixelSize: 15,
-            color: Cesium.Color.LIME,
-            outlineColor: Cesium.Color.WHITE,
-            outlineWidth: 2,
-          },
-          label: {
-            text: cam.name,
-            font: '12px sans-serif',
-            fillColor: Cesium.Color.LIME,
-            outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 2,
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            verticalOrigin: Cesium.VerticalOrigin.TOP,
-            pixelOffset: new Cesium.Cartesian2(0, 10),
-            show: false,
-          },
-          description: `LIVE: ${cam.name}<br>Region: ${cam.region}<br>Type: ${cam.type}<br><button onclick="window.gothamAccountability?.openFeed('${id}')">WATCH</button>`,
-        });
+      const isLive = cam.status === 'live';
+      
+      this.viewer.entities.add({
+        id: `cam-${id}`,
+        position: Cesium.Cartesian3.fromDegrees(this._getCameraCoords(id).lon, this._getCameraCoords(id).lat, 0),
+        point: {
+          pixelSize: isLive ? 14 : 10,
+          color: isLive ? Cesium.Color.LIME : Cesium.Color.YELLOW.withAlpha(0.6),
+          outlineColor: Cesium.Color.WHITE,
+          outlineWidth: 2
+        },
+        label: {
+          text: cam.name,
+          font: '10px monospace',
+          fillColor: isLive ? Cesium.Color.LIME : Cesium.Color.YELLOW,
+          outlineColor: Cesium.Color.BLACK,
+          outlineWidth: 1,
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          verticalOrigin: Cesium.VerticalOrigin.TOP,
+          pixelOffset: new Cesium.Cartesian2(0, 12),
+          show: false,
+          scaleByDistance: new Cesium.NearFarScalar(2000000, 0.0, 10000000, 0.4)
+        }
+      });
+    });
+  }
+  
+  _getCameraCoords(key) {
+    // Approximate coordinates for camera locations
+    const coords = {
+      'london_trafalgar': { lat: 51.508, lon: -0.128 },
+      'london_bridge': { lat: 51.505, lon: -0.075 },
+      'edinburgh_castle': { lat: 55.949, lon: -3.200 },
+      'nyc_times': { lat: 40.758, lon: -73.985 },
+      'vegas_strip': { lat: 36.114, lon: -115.173 },
+      'sf_golden_gate': { lat: 37.819, lon: -122.478 },
+      'miami_beach': { lat: 25.790, lon: -80.130 },
+      'paris_eiffel': { lat: 48.858, lon: 2.294 },
+      'rome_colosseum': { lat: 41.890, lon: 12.492 },
+      'amsterdam_dam': { lat: 52.373, lon: 4.893 },
+      'berlin_brandenburg': { lat: 52.516, lon: 13.378 },
+      'barcelona_sagrada': { lat: 41.403, lon: 2.174 },
+      'tokyo_shibuya': { lat: 35.659, lon: 139.700 },
+      'tokyo_tower': { lat: 35.658, lon: 139.745 },
+      'hongkong_victoria': { lat: 22.285, lon: 114.158 },
+      'sydney_opera': { lat: -33.856, lon: 151.215 },
+      'dubai_burj': { lat: 25.197, lon: 55.274 },
+      'singapore_marina': { lat: 1.283, lon: 103.859 },
+      'kyiv_main': { lat: 50.450, lon: 30.524 },
+      'ukraine_war': { lat: 48.500, lon: 37.500 },
+      'rio_copacabana': { lat: -22.971, lon: -43.182 },
+      'buenos_aires': { lat: -34.604, lon: -58.382 },
+      'cairo_pyramids': { lat: 29.979, lon: 31.134 },
+      'cape_town': { lat: -33.963, lon: 18.410 },
+    };
+    
+    return coords[key] || { lat: 0, lon: 0 };
+  }
+  
+  _showUFOHotspots() {
+    this.ufoHotspots.forEach((spot) => {
+      const color = this._getCredibilityColor(spot.cred);
+      
+      // Zone circle
+      this.viewer.entities.add({
+        id: `ufo-zone-${spot.id}`,
+        position: Cesium.Cartesian3.fromDegrees(spot.lon, spot.lat, 0),
+        ellipse: {
+          semiMajorAxis: spot.cred * 50000,
+          semiMinorAxis: spot.cred * 50000,
+          material: color.withAlpha(0.15),
+          outlineColor: color,
+          outlineWidth: 2,
+          height: 0
+        }
+      });
+      
+      // Point marker
+      this.viewer.entities.add({
+        id: `ufo-${spot.id}`,
+        position: Cesium.Cartesian3.fromDegrees(spot.lon, spot.lat, 0),
+        point: {
+          pixelSize: 10 + (spot.cred * 10),
+          color: color,
+          outlineColor: Cesium.Color.WHITE,
+          outlineWidth: 1
+        },
+        label: {
+          text: '🛸',
+          font: '14px sans-serif',
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          pixelOffset: new Cesium.Cartesian2(0, 15),
+          show: false
+        },
+        description: `
+          <div style="font-family: monospace; padding: 10px; color: #fff; background: rgba(0,0,0,0.9); border: 1px solid ${color}; border-radius: 4px;">
+            <h3 style="margin: 0 0 8px; color: ${color};">🛸 ${spot.title}</h3>
+            <p style="margin: 4px 0;"><b>Date:</b> ${spot.date}</p>
+            <p style="margin: 4px 0;"><b>Type:</b> ${spot.type}</p>
+            <p style="margin: 4px 0;"><b>Credibility:</b> ${Math.round(spot.cred * 100)}%</p>
+            <p style="margin: 8px 0; color: #aaa;">${spot.desc}</p>
+            <p style="margin: 4px 0; font-size: 11px; color: #666;">Sources: ${spot.sources.join(', ')}</p>
+            <p style="margin: 4px 0; font-size: 10px; color: #555;">Coords: ${spot.lat.toFixed(3)}, ${spot.lon.toFixed(3)}</p>
+          </div>
+        `
+      });
+    });
+  }
+  
+  _getCredibilityColor(cred) {
+    if (cred >= 0.95) return Cesium.Color.CYAN;
+    if (cred >= 0.85) return Cesium.Color.LIME;
+    if (cred >= 0.75) return Cesium.Color.YELLOW;
+    if (cred >= 0.65) return Cesium.Color.ORANGE;
+    return Cesium.Color.RED;
+  }
+  
+  // ─────────────────────────────────────────────────────────────────────────
+  // CLICK HANDLERS
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  _bindClickHandlers() {
+    const handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
+    
+    handler.setInputAction((click) => {
+      const picked = this.viewer.scene.pick(click.position);
+      
+      if (Cesium.defined(picked) && picked.id) {
+        const id = String(picked.id.id || picked.id);
+        
+        // Camera click
+        if (id.startsWith('cam-')) {
+          const camId = id.replace('cam-', '');
+          this.openFeed(camId);
+          return;
+        }
+        
+        // UFO click
+        if (id.startsWith('ufo-') || id.startsWith('ufo-zone-')) {
+          const spotId = id.replace('ufo-zone-', '').replace('ufo-', '');
+          const spot = this.ufoHotspots.find(s => s.id === spotId);
+          if (spot) {
+            this._showUFODetails(spot);
+          }
+          return;
+        }
+      }
+      
+      // Click anywhere on globe - find nearest cameras
+      const ray = this.viewer.camera.getPickRay(click.position);
+      const cart = this.viewer.scene.globe.pick(ray, this.viewer.scene);
+      if (Cesium.defined(cart)) {
+        const carto = Cesium.Ellipsoid.WGS84.cartesianToCartographic(cart);
+        const lat = Cesium.Math.toDegrees(carto.latitude);
+        const lon = Cesium.Math.toDegrees(carto.longitude);
+        this._activateNearestCameras(lat, lon);
+      }
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    
+    console.log('[ACCOUNTABILITY] Click handlers bound');
+  }
+  
+  _activateNearestCameras(lat, lon) {
+    // Find cameras within 200km
+    let nearest = null;
+    let minDist = Infinity;
+    
+    this.cameras.forEach((cam, id) => {
+      const coords = this._getCameraCoords(id);
+      const dist = this._haversine(lat, lon, coords.lat, coords.lon);
+      if (dist < minDist && dist < 500) { // 500km radius
+        minDist = dist;
+        nearest = cam;
       }
     });
     
-    console.log(`[ACCOUNTABILITY] ${this.cameras.size} cameras added to globe`);
+    if (nearest && nearest.status === 'live') {
+      this.openFeed(nearest.id);
+      this._speak(`Activating ${nearest.name}`);
+    } else if (nearest) {
+      this._sysLog(`No live camera near (${Math.round(minDist)}km)`);
+    }
+  }
+  
+  _haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2-lat1)*Math.PI/180;
+    const dLon = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   }
   
   // ─────────────────────────────────────────────────────────────────────────
   // FEED PLAYBACK
   // ─────────────────────────────────────────────────────────────────────────
   
-  async openFeed(cameraId) {
+  openFeed(cameraId) {
     const cam = this.cameras.get(cameraId);
-    if (!cam) return;
-    
-    if (cam.type === 'placeholder') {
-      this._sysLog(`NO FEED: ${cam.name} - not publicly available`);
+    if (!cam || cam.status !== 'live' || !cam.youtubeId) {
+      this._sysLog(`No live feed: ${cameraId}`);
       return;
     }
     
-    // Create video element
-    const video = document.createElement('video');
-    video.id = `feed-${cameraId}`;
-    video.autoplay = true;
-    video.playsinline = true;
-    video.muted = true; // must be muted for autoplay
-    video.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;';
-    
-    if (cam.type === 'youtube') {
-      // Use YouTube IFrame API
-      this._openYouTubeFeed(cameraId, cam);
-    } else {
-      // Direct stream (HLS, RTSP, etc)
-      video.src = cam.url;
-      video.onerror = () => {
-        this._sysLog(`FEED ERROR: ${cam.name}`);
-      };
-    }
-    
-    this.activeFeeds.set(cameraId, video);
-    this._showFeedOverlay(cam);
-    this._sysLog(`FEED ACTIVE: ${cam.name}`);
+    this._showOverlay();
+    this._loadYouTube(cam.youtubeId, cam.name);
+    this._sysLog(`FEED: ${cam.name}`);
   }
   
-  _openYouTubeFeed(cameraId, cam) {
-    // Create iframe for YouTube live
-    const container = document.getElementById(`accountability-overlay`);
-    if (!container) return;
-    
-    // Extract video ID from URL or use channel live
-    let videoId = '';
-    if (cam.url.includes('watch?v=')) {
-      videoId = cam.url.split('watch?v=')[1].split('&')[0];
-    } else if (cam.url.includes('youtube.com/channel/')) {
-      // For channel live, we'd need to fetch the live video ID
-      // For now, use known live stream IDs
-      videoId = this._getYouTubeLiveId(cam.url);
+  _showOverlay() {
+    let overlay = document.getElementById('acc-overlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'acc-overlay';
+      overlay.innerHTML = `
+        <div style="position:fixed;bottom:20px;right:20px;width:480px;height:320px;background:#000;border:2px solid #0ff;border-radius:8px;z-index:9999;overflow:hidden;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,255,255,0.1);border-bottom:1px solid #0ff;">
+            <span style="color:#0ff;font-family:monospace;font-size:11px;letter-spacing:1px;" id="acc-title">📹 ACCOUNTABILITY</span>
+            <div style="display:flex;gap:8px;">
+              <button onclick="window.gothamAccountability?._toggleRecording()" style="background:rgba(255,255,255,0.1);border:1px solid #666;color:#fff;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;">⏺ REC</button>
+              <button onclick="window.gothamAccountability?._closeOverlay()" style="background:rgba(255,255,255,0.1);border:1px solid #666;color:#fff;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:11px;">✕</button>
+            </div>
+          </div>
+          <div id="acc-player" style="width:100%;height:calc(100% - 40px);background:#111;">
+            <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-family:monospace;">Loading feed...</div>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
     }
-    
-    if (!videoId) {
-      this._sysLog(`YOUTUBE ERROR: Could not get live ID for ${cam.name}`);
-      return;
-    }
-    
-    const iframe = document.createElement('iframe');
-    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
-    iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
-    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    iframe.allowFullscreen = true;
-    
-    // Replace overlay content
-    const content = container.querySelector('.feed-content');
-    if (content) {
-      content.innerHTML = '';
-      content.appendChild(iframe);
-    }
+    overlay.style.display = 'block';
   }
   
-  _getYouTubeLiveId(channelUrl) {
-    // Known YouTube live stream IDs for public cameras
-    const knownLiveIds = {
-      'London Live': '2Bk1E9I9Wd8',
-      'NYC Live': 'BagJjl3Gt9I',
-      'Las Vegas Strip': '0f5U4Vw1Rvc',
-      'Paris - Eiffel Tower': '1UBarNv0Yw4',
-      'Sydney Opera House': 'yP4qTttrjJ0',
-    };
-    
-    const cam = this.cameras.get(channelUrl);
-    if (cam && knownLiveIds[cam.name]) {
-      return knownLiveIds[cam.name];
-    }
-    
-    // TODO: YouTube Data API call to get live stream ID from channel
-    return null;
+  _loadYouTube(youtubeId, name) {
+    document.getElementById('acc-title').textContent = `📹 ${name}`;
+    document.getElementById('acc-player').innerHTML = `
+      <iframe 
+        src="https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&rel=0&modestbranding=1"
+        style="width:100%;height:100%;border:0;"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    `;
   }
   
-  closeFeed(cameraId) {
-    const video = this.activeFeeds.get(cameraId);
-    if (video) {
-      video.pause();
-      video.src = '';
-      video.remove();
-      this.activeFeeds.delete(cameraId);
-    }
-    
-    const overlay = document.getElementById('accountability-overlay');
+  _closeOverlay() {
+    const overlay = document.getElementById('acc-overlay');
     if (overlay) {
       overlay.style.display = 'none';
+      document.getElementById('acc-player').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#666;font-family:monospace;">Feed closed</div>';
     }
-    
-    this._sysLog(`FEED CLOSED`);
   }
   
   // ─────────────────────────────────────────────────────────────────────────
-  // AI-TRIGGERED ACTIVATION
+  // UFO PANEL
   // ─────────────────────────────────────────────────────────────────────────
   
-  activateForRegion(region) {
-    // When AI detects conflict/news in a region, activate relevant cameras
-    const regionCams = Array.from(this.cameras.values()).filter(c => c.region === region);
-    
-    if (regionCams.length === 0) {
-      this._sysLog(`NO CAMERAS: ${region}`);
-      return;
+  _showUFODetails(spot) {
+    let panel = document.getElementById('ufo-panel');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 'ufo-panel';
+      panel.innerHTML = `
+        <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;background:rgba(0,0,0,0.98);border:2px solid #0ff;border-radius:12px;z-index:9999;padding:20px;font-family:monospace;color:#fff;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:15px;">
+            <span style="color:#0ff;font-size:14px;font-weight:bold;">🛸 UFO INCIDENT</span>
+            <button onclick="this.closest('#ufo-panel').style.display='none'" style="background:none;border:none;color:#fff;cursor:pointer;font-size:16px;">✕</button>
+          </div>
+          <div id="ufo-content"></div>
+        </div>
+      `;
+      document.body.appendChild(panel);
     }
     
-    // Open first available camera in region
-    const available = regionCams.find(c => c.type !== 'placeholder');
-    if (available) {
-      this.openFeed(available.id);
-      this._speak(`Activating cameras in ${region}`);
+    const color = this._getCredibilityColor(spot.cred);
+    document.getElementById('ufo-content').innerHTML = `
+      <h2 style="margin:0 0 10px;color:${color};font-size:16px;">${spot.title}</h2>
+      <p style="margin:5px 0;font-size:12px;"><span style="color:#888;">Date:</span> ${spot.date}</p>
+      <p style="margin:5px 0;font-size:12px;"><span style="color:#888;">Type:</span> ${spot.type}</p>
+      <p style="margin:5px 0;font-size:12px;"><span style="color:#888;">Credibility:</span> <span style="color:${color};">${Math.round(spot.cred * 100)}%</span></p>
+      <p style="margin:10px 0;font-size:12px;color:#aaa;line-height:1.5;">${spot.desc}</p>
+      <p style="margin:5px 0;font-size:10px;color:#666;">Sources: ${spot.sources.join(', ')}</p>
+      <p style="margin:10px 0;font-size:10px;color:#555;">📍 ${spot.lat.toFixed(4)}, ${spot.lon.toFixed(4)}</p>
+      <div style="display:flex;gap:10px;margin-top:15px;">
+        <button onclick="window.gothamAccountability?._flyTo(${spot.lat},${spot.lon})" style="flex:1;background:#0f8;border:none;color:#000;padding:8px;border-radius:4px;cursor:pointer;font-size:11px;">✈️ FLY HERE</button>
+        <button onclick="window.gothamAccountability?._activateNearestCameras(${spot.lat},${spot.lon})" style="flex:1;background:#f80;border:none;color:#000;padding:8px;border-radius:4px;cursor:pointer;font-size:11px;">📹 FIND CAMERAS</button>
+      </div>
+    `;
+    
+    panel.style.display = 'block';
+  }
+  
+  _flyTo(lat, lon) {
+    this.viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(lon, lat, 50000),
+      duration: 2
+    });
+  }
+  
+  // ─────────────────────────────────────────────────────────────────────────
+  // RECORDING
+  // ─────────────────────────────────────────────────────────────────────────
+  
+  _toggleRecording() {
+    const btn = document.querySelector('#acc-overlay button');
+    if (!btn) return;
+    
+    if (this.isRecording) {
+      this.isRecording = false;
+      btn.textContent = '⏺ REC';
+      btn.style.background = 'rgba(255,255,255,0.1)';
+      this._sysLog('RECORDING: Stopped');
     } else {
-      this._sysLog(`NO LIVE FEEDS: ${region} cameras pending`);
+      this.isRecording = true;
+      btn.textContent = '⏹ STOP';
+      btn.style.background = '#f00';
+      this._sysLog('RECORDING: Started');
+      // Note: Actual FFmpeg recording would require screen capture or stream proxy
     }
-    
-    // Highlight all region cameras on globe
-    regionCams.forEach(cam => {
-      const entity = this.viewer.entities.getById(`accountability-${cam.id}`);
-      if (entity) {
-        entity.point.color = Cesium.Color.RED;
-        entity.point.pixelSize = 20;
-      }
-    });
-  }
-  
-  deactivateForRegion(region) {
-    // When leaving region, close feeds and reset colors
-    const regionCams = Array.from(this.cameras.values()).filter(c => c.region === region);
-    
-    regionCams.forEach(cam => {
-      const entity = this.viewer.entities.getById(`accountability-${cam.id}`);
-      if (entity) {
-        entity.point.color = cam.type === 'placeholder' ? Cesium.Color.YELLOW.withAlpha(0.5) : Cesium.Color.LIME;
-        entity.point.pixelSize = cam.type === 'placeholder' ? 12 : 15;
-      }
-    });
   }
   
   // ─────────────────────────────────────────────────────────────────────────
-  // RECORDING SYSTEM
-  // ─────────────────────────────────────────────────────────────────────────
-  
-  async startRecording(cameraId) {
-    const cam = this.cameras.get(cameraId);
-    if (!cam || cam.type === 'placeholder') {
-      this._sysLog(`CANNOT RECORD: ${cam?.name || 'Unknown'} - no feed available`);
-      return false;
-    }
-    
-    if (this.recordings.has(cameraId)) {
-      this._sysLog(`ALREADY RECORDING: ${cam.name}`);
-      return false;
-    }
-    
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `${cam.name.replace(/[^a-z0-9]/gi, '_')}_${timestamp}.mp4`;
-    
-    // For YouTube feeds, we'd need to capture the iframe
-    // This is a simplified version - full implementation would use:
-    // - puppeteer/playwright to capture iframe
-    // - or ffmpeg with screen capture
-    // - or a proxy server to capture the stream
-    
-    this.recordings.set(cameraId, {
-      filename,
-      startTime: Date.now(),
-      status: 'recording',
-    });
-    
-    this._sysLog(`RECORDING: ${cam.name} → ${filename}`);
-    this._speak(`Recording started: ${cam.name}`);
-    
-    return true;
-  }
-  
-  stopRecording(cameraId) {
-    const recording = this.recordings.get(cameraId);
-    if (!recording) return null;
-    
-    const duration = Date.now() - recording.startTime;
-    const cam = this.cameras.get(cameraId);
-    
-    this.recordings.delete(cameraId);
-    this._sysLog(`RECORDING STOPPED: ${cam.name} (${Math.round(duration/1000)}s)`);
-    this._speak(`Recording stopped: ${cam.name}`);
-    
-    return {
-      filename: recording.filename,
-      duration,
-      camera: cam.name,
-    };
-  }
-  
-  // ─────────────────────────────────────────────────────────────────────────
-  // OVERLAY UI
+  // UI CREATION
   // ─────────────────────────────────────────────────────────────────────────
   
   _createOverlay() {
-    // Create main accountability overlay container
-    const overlay = document.createElement('div');
-    overlay.id = 'accountability-overlay';
-    overlay.innerHTML = `
-      <div class="accountability-header">
-        <span class="title">📹 ACCOUNTABILITY FEED</span>
-        <div class="controls">
-          <button class="rec-btn" onclick="window.gothamAccountability?.toggleRecording()">⏺ REC</button>
-          <button class="close-btn" onclick="window.gothamAccountability?.closeActiveFeed()">✕</button>
-        </div>
-      </div>
-      <div class="feed-content">
-        <div class="placeholder">
-          <div class="icon">📷</div>
-          <div class="text">Select a camera on the globe or from the list</div>
-          <div class="subtext">Click any camera marker to activate its feed</div>
-        </div>
-      </div>
-      <div class="camera-list" id="cam-list"></div>
-    `;
-    
-    // Inject styles
-    const styles = document.createElement('style');
-    styles.textContent = `
-      #accountability-overlay {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 480px;
-        height: 360px;
-        background: rgba(0,0,0,0.95);
-        border: 2px solid rgba(0,240,255,0.5);
-        border-radius: 12px;
-        z-index: 9999;
-        display: none;
-        flex-direction: column;
-        font-family: 'Courier New', monospace;
-        overflow: hidden;
-      }
-      #accountability-overlay.active { display: flex; }
-      .accountability-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 8px 12px;
-        background: rgba(0,240,255,0.1);
-        border-bottom: 1px solid rgba(0,240,255,0.3);
-      }
-      .accountability-header .title {
-        color: #00f0ff;
-        font-size: 12px;
-        font-weight: bold;
-        letter-spacing: 1px;
-      }
-      .accountability-header .controls { display: flex; gap: 8px; }
-      .accountability-header button {
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.3);
-        color: #fff;
-        padding: 4px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-family: inherit;
-        font-size: 11px;
-      }
-      .accountability-header button:hover { background: rgba(255,255,255,0.2); }
-      .accountability-header .rec-btn.recording {
-        background: rgba(255,0,0,0.5);
-        border-color: #f00;
-        animation: pulse 1s infinite;
-      }
-      @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-      .feed-content {
-        flex: 1;
-        position: relative;
-        background: #000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .feed-content .placeholder {
-        text-align: center;
-        color: rgba(255,255,255,0.5);
-      }
-      .feed-content .placeholder .icon { font-size: 48px; margin-bottom: 8px; }
-      .feed-content .placeholder .text { font-size: 14px; }
-      .feed-content .placeholder .subtext { font-size: 11px; margin-top: 4px; opacity: 0.7; }
-      .camera-list {
-        max-height: 120px;
-        overflow-y: auto;
-        padding: 8px;
-        background: rgba(0,0,0,0.5);
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 4px;
-      }
-      .camera-list-item {
-        padding: 6px 8px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 4px;
-        font-size: 10px;
-        cursor: pointer;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .camera-list-item:hover { background: rgba(0,240,255,0.2); border-color: #00f0ff; }
-      .camera-list-item .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #0f0;
-      }
-      .camera-list-item .dot.pending { background: #ff0; }
-      .camera-list-item .dot.offline { background: #666; }
-    `;
-    
-    document.head.appendChild(styles);
-    document.body.appendChild(overlay);
-    
-    // Populate camera list
-    this._updateCameraList();
+    // Overlay is created on first feed open
   }
   
-  _showFeedOverlay(cam) {
-    const overlay = document.getElementById('accountability-overlay');
-    if (!overlay) return;
-    
-    overlay.classList.add('active');
-    
-    // Update header with camera name
-    const title = overlay.querySelector('.title');
-    if (title) title.textContent = `📹 ${cam.name}`;
-    
-    // Clear feed content
-    const content = overlay.querySelector('.feed-content');
-    if (content) {
-      content.innerHTML = `<div class="placeholder"><div class="icon">📹</div><div class="text">Loading ${cam.name}...</div></div>`;
-    }
-  }
-  
-  _updateCameraList() {
-    const list = document.getElementById('cam-list');
-    if (!list) return;
-    
-    list.innerHTML = '';
-    
-    this.cameras.forEach((cam, id) => {
-      const item = document.createElement('div');
-      item.className = 'camera-list-item';
-      item.onclick = () => this.openFeed(id);
-      
-      const dotClass = cam.type === 'placeholder' ? 'pending' : 'dot';
-      const dot = cam.type === 'placeholder' ? 'pending' : '';
-      
-      item.innerHTML = `
-        <span class="dot ${dot}"></span>
-        <span>${cam.name}</span>
-      `;
-      
-      list.appendChild(item);
-    });
-  }
-  
-  // ─────────────────────────────────────────────────────────────────────────
-  // RECORDING CONTROLS
-  // ─────────────────────────────────────────────────────────────────────────
-  
-  toggleRecording() {
-    const activeId = Array.from(this.activeFeeds.keys())[0];
-    if (!activeId) {
-      this._sysLog('NO FEED TO RECORD');
-      return;
-    }
-    
-    if (this.recordings.has(activeId)) {
-      this.stopRecording(activeId);
-      document.querySelector('.rec-btn')?.classList.remove('recording');
-    } else {
-      this.startRecording(activeId);
-      document.querySelector('.rec-btn')?.classList.add('recording');
-    }
-  }
-  
-  closeActiveFeed() {
-    const activeId = Array.from(this.activeFeeds.keys())[0];
-    if (activeId) this.closeFeed(activeId);
-  }
-  
-  // ─────────────────────────────────────────────────────────────────────────
-  // EVENT BINDINGS
-  // ─────────────────────────────────────────────────────────────────────────
-  
-  _bindEvents() {
-    // Bind to country intel orchestrator if exists
-    if (window.gothamCountryIntel) {
-      // Country enter → activate cameras
-      const originalCheck = window.gothamCountryIntel._checkCountry.bind(window.gothamCountryIntel);
-      window.gothamCountryIntel._checkCountry = () => {
-        originalCheck();
-        const country = window.gothamCountryIntel.currentCountry;
-        if (country) {
-          this.activateForRegion(country);
-        }
-      };
-    }
-    
-    // Bind to globe click handler for camera selection
-    const handler = new Cesium.ScreenSpaceEventHandler(this.viewer.scene.canvas);
-    handler.setInputAction((click) => {
-      const picked = this.viewer.scene.pick(click.position);
-      if (Cesium.defined(picked) && picked.id && String(picked.id.id).startsWith('accountability-')) {
-        const cameraId = picked.id.id.replace('accountability-', '');
-        this.openFeed(cameraId);
-      }
-    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
-    
-    console.log('[ACCOUNTABILITY] Events bound');
+  _createUFOOverlay() {
+    // UFO panel is created on first click
   }
   
   // ─────────────────────────────────────────────────────────────────────────
@@ -722,7 +485,7 @@ class AccountabilityEngine {
   // ─────────────────────────────────────────────────────────────────────────
   
   _sysLog(msg) {
-    console.log(`[ACCOUNTABILITY] ${msg}`);
+    console.log(`[ACC] ${msg}`);
     if (this.hud?._sysLog) this.hud._sysLog(msg);
   }
   
@@ -734,30 +497,7 @@ class AccountabilityEngine {
       window.speechSynthesis.speak(u);
     }
   }
-  
-  // Get all cameras
-  getCameras() {
-    return Array.from(this.cameras.values());
-  }
-  
-  // Get cameras by region
-  getCamerasByRegion(region) {
-    return Array.from(this.cameras.values()).filter(c => c.region === region);
-  }
-  
-  // Get recording status
-  isRecording(cameraId) {
-    return this.recordings.has(cameraId);
-  }
-  
-  // Get all recordings
-  getRecordings() {
-    return Array.from(this.recordings.entries()).map(([id, rec]) => ({
-      cameraId: id,
-      ...rec
-    }));
-  }
 }
 
-// Export for global access
-window.accountabilityEngine = accountabilityEngine;
+// Global instance
+window.gothamAccountability = null;

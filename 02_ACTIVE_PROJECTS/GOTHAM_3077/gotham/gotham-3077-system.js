@@ -19,9 +19,9 @@ class Gotham3077System {
     this.dataCache = {}
     this.selectedEntity = null
     this._lastRender = 0
-    this._renderThrottle = 800  // Reduced from 1500 for better responsiveness
-    this._batchSize = 100  // Increased from 40 for better throughput
-    this._drainDelay = 16  // Reduced from 100 for 60fps target
+    this._renderThrottle = 2000
+    this._batchSize = 25
+    this._drainDelay = 50
 
     this._entityIds = new Map()
     this._movingEntities = new Map()
@@ -275,16 +275,20 @@ class Gotham3077System {
   _setupClickHandler () {
     var self = this; var handler = new Cesium.ScreenSpaceEventHandler(this.viewer.canvas)
     this._eventHandlers.push({ element: this.viewer.canvas, type: 'click', fn: handler })
-    
+
     handler.setInputAction((click) => {
       if (self._isDestroyed) return
-      
+
       var picked = self.viewer.scene.pick(click.position)
       if (Cesium.defined(picked) && picked.id) {
         var eid = typeof picked.id === 'string' ? picked.id : (picked.id.id || '')
         var meta = self.entityMeta.get(eid)
         if (meta) {
+          // Remove trail/tether from previously selected entity
+          self._removeSelectionOverlays()
           self.selectedEntity = eid; self._showInfoPanel(meta.type, meta.data)
+          // Create on-demand trail + tether for this entity
+          self._createSelectionOverlays(eid, meta)
           var entity = self.viewer.entities.getById(eid)
           if (entity && meta.data.lat != null) {
             self.viewer.flyTo(entity, {
@@ -296,9 +300,99 @@ class Gotham3077System {
           }
         }
       } else {
+        self._removeSelectionOverlays()
         self.viewer.trackedEntity = undefined;
       }
     }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+  }
+
+  _removeSelectionOverlays () {
+    const prefixes = ['sel-trail-', 'sel-tether-', 'sel-orbit-', 'sel-footprint-']
+    prefixes.forEach(prefix => {
+      const existing = this.viewer.entities.values.filter(e =>
+        typeof e.id === 'string' && e.id.startsWith(prefix)
+      )
+      existing.forEach(e => this.viewer.entities.remove(e))
+    })
+    this._selTrailPositions = null
+  }
+
+  _createSelectionOverlays (eid, meta) {
+    const d = meta.data
+    const type = meta.type
+    if (!d || d.lat == null || d.lon == null) return
+
+    const lat = d.lat || d.latitude
+    const lon = d.lon || d.longitude || d.lng
+    const alt = d.alt || d.alt_km ? (d.alt_km || 0) * 1000 : (type === 'flight' || type === 'military' ? Math.max(d.alt || 10000, 500) : 150)
+    const entityPos = Cesium.Cartesian3.fromDegrees(lon, lat, alt)
+
+    // Trail colors by type
+    const trailColors = {
+      flight: Cesium.Color.CYAN.withAlpha(0.5),
+      military: Cesium.Color.MAGENTA.withAlpha(0.6),
+      transit: Cesium.Color.fromCssColorString('#33ff99').withAlpha(0.5),
+      traffic: Cesium.Color.fromCssColorString('#ffaa00').withAlpha(0.5),
+      ship: Cesium.Color.fromCssColorString('#00ccff').withAlpha(0.5),
+      satellite: Cesium.Color.YELLOW.withAlpha(0.4)
+    }
+    const trailColor = trailColors[type] || Cesium.Color.WHITE.withAlpha(0.4)
+
+    // Ground tether — vertical line from entity to ground
+    const isAerial = ['flight', 'military', 'satellite'].includes(type)
+    if (isAerial) {
+      const groundPos = Cesium.Cartesian3.fromDegrees(lon, lat, 0)
+      this.viewer.entities.add({
+        id: 'sel-tether-' + eid,
+        polyline: {
+          positions: [entityPos, groundPos],
+          width: 1,
+          material: new Cesium.PolylineDashMaterialProperty({
+            color: trailColor.withAlpha(0.3),
+            dashLength: 8
+          }),
+          disableDepthTestDistance: Number.POSITIVE_INFINITY
+        }
+      })
+    }
+
+    // Trail — start with current position, grows over time via _updateSelectionTrail
+    const isMoving = ['flight', 'military', 'transit', 'traffic', 'ship'].includes(type)
+    if (isMoving) {
+      this._selTrailPositions = [entityPos]
+      this._selTrailEntityId = eid
+      this.viewer.entities.add({
+        id: 'sel-trail-' + eid,
+        polyline: {
+          positions: new Cesium.CallbackProperty(() => {
+            return this._selTrailPositions && this._selTrailPositions.length >= 2
+              ? this._selTrailPositions : [entityPos, entityPos]
+          }, false),
+          width: 2,
+          material: new Cesium.PolylineGlowMaterialProperty({ glowPower: 0.15, color: trailColor }),
+          disableDepthTestDistance: Number.POSITIVE_INFINITY
+        }
+      })
+    }
+
+    // Satellite footprint circle + orbital ring (only for satellites)
+    if (type === 'satellite') {
+      const altKm = d.alt_km || d.alt || 400
+      const footprintRadius = Math.sqrt(altKm * 1000 * 12742000) // geometric horizon
+      this.viewer.entities.add({
+        id: 'sel-footprint-' + eid,
+        position: Cesium.Cartesian3.fromDegrees(lon, lat),
+        ellipse: {
+          semiMajorAxis: Math.min(footprintRadius, 3000000),
+          semiMinorAxis: Math.min(footprintRadius, 3000000),
+          material: Cesium.Color.YELLOW.withAlpha(0.05),
+          outline: true,
+          outlineColor: Cesium.Color.YELLOW.withAlpha(0.3),
+          outlineWidth: 1,
+          height: 0
+        }
+      })
+    }
   }
 
   _setupKeyboardControls () {
@@ -359,9 +453,18 @@ class Gotham3077System {
     }
     
     this._updateMovingEntities(dt)
-    
+
     if (this._frameId % 3 === 0) {
       this._updateTrafficFlow(dt)
+    }
+
+    // Grow selection trail for tracked entity (every 10 frames to avoid GC pressure)
+    if (this._selTrailPositions && this._selTrailEntityId && this._frameId % 10 === 0) {
+      const me = this._movingEntities.get(this._selTrailEntityId)
+      if (me && me.posCartesian) {
+        this._selTrailPositions.push(me.posCartesian.clone())
+        if (this._selTrailPositions.length > 200) this._selTrailPositions.shift()
+      }
     }
   }
 
@@ -474,10 +577,26 @@ class Gotham3077System {
 
   _updateLayers (data) {
     if (this._isDestroyed) return
+
+    // ALWAYS update the data cache even if we throttle rendering
+    // This ensures toggleLayer/createEntitiesForTypes have fresh data
+    if (data) {
+      if (!this.dataCache || !this.dataCache.flights || this.dataCache.flights.length === 0) {
+        // First data - merge everything
+        this.dataCache = data
+      } else {
+        // Merge new data into cache (delta updates only contain changed keys)
+        Object.keys(data).forEach(k => {
+          if (Array.isArray(data[k]) && data[k].length > 0) {
+            this.dataCache[k] = data[k]
+          }
+        })
+      }
+    }
+
     var now = Date.now()
     if (now - this._lastRender < this._renderThrottle) return
     this._lastRender = now
-    this.dataCache = data
 
     var self = this
     
@@ -510,7 +629,8 @@ class Gotham3077System {
       ['fireballs', 'fireball', 'meteor', self._fireballStyle],
       ['carbon', 'carbon', 'co2', self._carbonStyle],
       ['github', 'github', 'gh', self._githubStyle],
-      // ShadowBroker Integrations
+      // Maritime data (main DataStore uses 'maritime', ShadowBroker uses 'ships')
+      ['maritime', 'ship', 'mar', self._shipStyle],
       ['ships', 'ship', 'ship', self._shipStyle],
       ['news', 'news', 'news', self._newsStyle],
       ['frontlines', 'frontline', 'front', self._frontlineStyle],
@@ -533,6 +653,8 @@ class Gotham3077System {
       satellite: 'satellite',
       traffic: 'traffic',
       transit: 'transit',
+      bikeshare: 'transit',
+      evcharger: 'transit',
       cctv: 'cctv',
       earthquake: 'hazard',
       volcano: 'hazard',
@@ -540,24 +662,64 @@ class Gotham3077System {
       gdacs: 'hazard',
       weather: 'environment',
       airquality: 'environment',
+      water: 'environment',
+      spacewx: 'environment',
+      river: 'environment',
+      carbon: 'environment',
       crime: 'intel',
-      buoy: 'sea',
-      tide: 'sea',
-      neo: 'space',
-      ship: 'sea',
       news: 'intel',
       frontline: 'intel',
+      kiwisdr: 'intel',
+      financial: 'intel',
+      jamming: 'intel',
+      alien: 'intel',
+      buoy: 'sea',
+      tide: 'sea',
+      ship: 'sea',
+      neo: 'space',
+      fireball: 'space',
+      star: 'space',
+      meteor: 'space',
       outage: 'infrastructure',
-      infrastructure: 'infrastructure'
+      infrastructure: 'infrastructure',
+      github: 'github'
     }
 
+    // Normalize coordinate fields: ensure every item has lat/lng
+    // Some sources use coords:[lat,lng], longitude, lng, etc.
+    function normalizeCoords(items) {
+      for (var i = 0; i < items.length; i++) {
+        var d = items[i];
+        if (d.lat == null && d.coords && Array.isArray(d.coords) && d.coords.length >= 2) {
+          d.lat = d.coords[0]; d.lng = d.coords[1];
+        }
+        if (d.lat == null && d.latitude != null) d.lat = d.latitude;
+        if (d.lng == null && d.lon != null) d.lng = d.lon;
+        if (d.lng == null && d.longitude != null) d.lng = d.longitude;
+      }
+      return items;
+    }
+
+    // Per-type entity limits to prevent lag
+    var maxPerType = {
+      flight: 200, military: 50, satellite: 100, traffic: 100,
+      transit: 80, ship: 80, earthquake: 50, wildfire: 80,
+      news: 30, kiwisdr: 60, infrastructure: 100, alien: 30
+    }
+    var defaultMax = 150
+
     // Prepare queue based on visibility
+    // Default to visible if HUD hasn't loaded yet (boot race condition)
+    const hudVis = window.gothamHUD?.layerVisibility;
     feeds.forEach((f) => {
       var vGroup = visMap[f[1]] || f[1]
-      var isVis = window.gothamHUD?.layerVisibility?.[vGroup] === true
+      var isVis = hudVis ? (hudVis[vGroup] === true) : true
       if (isVis && Array.isArray(data[f[0]])) {
+        var rawItems = normalizeCoords(data[f[0]])
+        var limit = maxPerType[f[1]] || defaultMax
+        var items = rawItems.length > limit ? rawItems.slice(0, limit) : rawItems
         queue.push({
-          items: data[f[0]],
+          items: items,
           type: f[1],
           prefix: f[2],
           styleFn: f[3],
@@ -696,15 +858,15 @@ class Gotham3077System {
             const alt = ['flight', 'military'].includes(entityType) ? Math.max(d.alt || 10000, 500) : 150;
             
             if (e.billboard) { 
-              e.billboard.disableDepthTestDistance = 3000; 
+              e.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY; 
               e.billboard.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE;
             }
             if (e.point) { 
-              e.point.disableDepthTestDistance = 3000; 
+              e.point.disableDepthTestDistance = Number.POSITIVE_INFINITY; 
               e.point.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE;
             }
             if (e.label) { 
-              e.label.disableDepthTestDistance = 3000; 
+              e.label.disableDepthTestDistance = Number.POSITIVE_INFINITY; 
               e.label.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE;
             }
             
@@ -792,14 +954,6 @@ class Gotham3077System {
     var idx = 0; 
     var batchSize = this._batchSize
     
-    // Pre-allocate trail color to avoid GC
-    const trailColor = type === 'military' ? Cesium.Color.MAGENTA.withAlpha(0.6) : 
-                       type === 'flight' ? Cesium.Color.CYAN.withAlpha(0.4) : 
-                       type === 'transit' ? Cesium.Color.fromCssColorString('#33ff99').withAlpha(0.5) : 
-                       Cesium.Color.fromCssColorString('#ffaa00').withAlpha(0.5);
-    const trailWidth = (type === 'military' || type === 'flight') ? 2 : 1.5;
-    const maxTrailLength = type === 'military' ? 25 : 15;
-    
     var nextBatch = () => {
       if (this._isDestroyed) return
       var end = Math.min(idx + batchSize, items.length)
@@ -829,80 +983,28 @@ class Gotham3077System {
 
           e.show = isVisible; styleFn.call(self, e, d)
           
-          if (e.billboard) { e.billboard.disableDepthTestDistance = 3000; e.billboard.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE }
-          if (e.label) { e.label.disableDepthTestDistance = 3000; e.label.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE; e.label.show = true }
-          if (e.point) { e.point.disableDepthTestDistance = 3000; e.point.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE }
+          if (e.billboard) { e.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY; e.billboard.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE }
+          if (e.label) { e.label.disableDepthTestDistance = Number.POSITIVE_INFINITY; e.label.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE; e.label.show = true }
+          if (e.point) { e.point.disableDepthTestDistance = Number.POSITIVE_INFINITY; e.point.heightReference = isSurface ? Cesium.HeightReference.RELATIVE_TO_GROUND : Cesium.HeightReference.NONE }
 
-          // Only create CallbackProperty once per entity
-          if (!e.position || !e.position._isGothamCB) {
-            e.position = new Cesium.CallbackProperty(() => {
-              const me = self._movingEntities.get(key); return (me && me.posCartesian) ? me.posCartesian : pos
-            }, false); 
-            e.position._isGothamCB = true
-            e.position._gothamKey = key  // Store key for debugging
-          }
-
-          // Track moving entities
-          if (['flight', 'military', 'transit', 'traffic'].includes(type)) {
+          // Moving entities get CallbackProperty, static entities get direct position
+          const isMoving = ['flight', 'military', 'transit', 'traffic'].includes(type)
+          if (isMoving) {
             self._movingEntities.set(key, { lat: lat, lon: lon, alt: alt, posCartesian: pos, velocity: d.velocity || 5, heading: d.heading || 0, lastUpdate: Date.now() })
-            
-            // Trails - optimized
-            let trail = self._trailPositions.get(key);
-            if (!trail) {
-              trail = [];
-              self._trailPositions.set(key, trail);
+            if (!e.position || !e.position._isGothamCB) {
+              e.position = new Cesium.CallbackProperty(() => {
+                const me = self._movingEntities.get(key); return (me && me.posCartesian) ? me.posCartesian : pos
+              }, false)
+              e.position._isGothamCB = true
             }
-            if (!isNaN(pos.x)) trail.push(pos);
-            if (trail.length > maxTrailLength) trail.shift();
-            
-            // Create/update trail entity only when needed
-            let trailId = 'trail-' + key; 
-            let te = self.viewer.entities.getById(trailId);
-            if (!te && trail.length > 2) {
-              // Create new trail entity with static show property (no CallbackProperty for show)
-              te = self.viewer.entities.add({ 
-                id: trailId, 
-                show: isVisible,
-                polyline: { 
-                  positions: new Cesium.CallbackProperty(() => {
-                    var t = self._trailPositions.get(key); 
-                    return (t && t.length >= 2) ? t : [self.SAFE_POS, self.SAFE_POS];
-                  }, false), 
-                  width: trailWidth, 
-                  material: new Cesium.PolylineGlowMaterialProperty({ glowPower: 0.15, color: trailColor }),
-                  disableDepthTestDistance: 3000
-                } 
-              });
-            } else if (te) { 
-              te.show = isVisible;
-            }
-
-            // Tethers for flights and military
-            if (type === 'flight' || type === 'military') {
-              let tetherId = 'tether-' + key; 
-              let teth = self.viewer.entities.getById(tetherId);
-              if (!teth) {
-                const tetherColor = type === 'military' ? Cesium.Color.MAGENTA : Cesium.Color.CYAN;
-                teth = self.viewer.entities.add({ 
-                  id: tetherId, 
-                  show: false, // Hidden by default, shown on selection
-                  polyline: { 
-                    positions: new Cesium.CallbackProperty(() => {
-                      var me = self._movingEntities.get(key);
-                      if (!me || !me.posCartesian || isNaN(me.posCartesian.x) || isNaN(me.lat)) {
-                        return [self.SAFE_POS, self.SAFE_POS];
-                      }
-                      return [Cesium.Cartesian3.fromDegrees(me.lon, me.lat, 0), me.posCartesian];
-                    }, false), 
-                    width: 1, 
-                    material: tetherColor.withAlpha(0.2),
-                    disableDepthTestDistance: 3000
-                  } 
-                });
-              }
-            }
+          } else {
+            // Static position — no per-frame cost
+            e.position = pos
           }
-        } catch (err) { 
+
+          // Trails/tethers created on-demand when entity is selected (see _onEntityClick)
+
+        } catch (err) {
           console.warn('[ENTITY SYSTEM] Error in batch render:', err);
         }
       }
@@ -936,72 +1038,29 @@ class Gotham3077System {
           
           let e = self.viewer.entities.getById(key)
           if (!e) { e = new Cesium.Entity({ id: key }); self.viewer.entities.add(e) }
-          
+
+          // Compute position from lat/lng/alt
+          const satLat = s.lat || s.latitude
+          const satLng = s.lng || s.lon || s.longitude
+          const satAltKm = s.alt_km || s.alt || 400
+          if (satLat == null || satLng == null) continue
+          const satPos = Cesium.Cartesian3.fromDegrees(satLng, satLat, satAltKm * 1000)
+          s.posCartesian = satPos
+
           if (!e.position || !e.position._isGothamCB) {
             e.position = new Cesium.CallbackProperty(() => {
-              const meta = self.entityMeta.get(key); 
-              return (meta && meta.data.posCartesian) ? meta.data.posCartesian : Cesium.Cartesian3.fromDegrees(0,0,400000)
-            }, false); 
+              const meta = self.entityMeta.get(key);
+              return (meta && meta.data.posCartesian) ? meta.data.posCartesian : satPos
+            }, false);
             e.position._isGothamCB = true
           }
-          
-          e.show = isVisible; 
-          if (!e.point) e.point = new Cesium.PointGraphics({ pixelSize: 5, color: Cesium.Color.YELLOW, disableDepthTestDistance: 3000 })
-          if (!e.label) e.label = new Cesium.LabelGraphics({ text: s.name, font: '8px "Share Tech Mono"', fillColor: Cesium.Color.YELLOW, pixelOffset: new Cesium.Cartesian2(8,0), disableDepthTestDistance: 3000 })
 
-          // Satellite Coverage Footprint
-          if (!e.ellipse) {
-            var altKm = s.alt || 400;
-            var coverageRadius = altKm * 1000 * Math.tan(Cesium.Math.toRadians(25)); // 25-degree field of view
-            if (coverageRadius < 100000) coverageRadius = 100000;
-            
-            var footprintColor = Cesium.Color.CYAN.withAlpha(0.05);
-            var outlineColor = Cesium.Color.CYAN.withAlpha(0.2);
-            
-            if (altKm > 2000 && altKm < 35000) {
-              footprintColor = Cesium.Color.fromCssColorString('#4488ff').withAlpha(0.05);
-              outlineColor = Cesium.Color.fromCssColorString('#4488ff').withAlpha(0.2);
-            } else if (altKm >= 35000) {
-              footprintColor = Cesium.Color.YELLOW.withAlpha(0.05);
-              outlineColor = Cesium.Color.YELLOW.withAlpha(0.2);
-            }
+          e.show = isVisible;
+          if (!e.point) e.point = new Cesium.PointGraphics({ pixelSize: 5, color: Cesium.Color.YELLOW, disableDepthTestDistance: Number.POSITIVE_INFINITY })
+          if (!e.label) e.label = new Cesium.LabelGraphics({ text: s.name, font: '8px "Share Tech Mono"', fillColor: Cesium.Color.YELLOW, pixelOffset: new Cesium.Cartesian2(8,0), disableDepthTestDistance: Number.POSITIVE_INFINITY })
 
-            e.ellipse = new Cesium.EllipseGraphics({
-              semiMajorAxis: coverageRadius,
-              semiMinorAxis: coverageRadius,
-              material: new Cesium.ColorMaterialProperty(footprintColor),
-              outline: true,
-              outlineColor: outlineColor,
-              outlineWidth: 1,
-              // Only show footprint when zoomed out far enough to see it properly
-              distanceDisplayCondition: new Cesium.DistanceDisplayCondition(2000000, Number.MAX_VALUE)
-            });
-          }
-
-          // Orbital Rings - create once
-          let orbitId = 'orbit-' + key;
-          let orb = self.viewer.entities.getById(orbitId);
-          if (!orb && s.tle1 && typeof satellite !== 'undefined') {
-            var satrec = satellite.twoline2satrec(s.tle1, s.tle2);
-            var points = self._generateFullOrbit(satrec);
-            var altKm = s.alt || 400;
-            var ringColor = Cesium.Color.CYAN.withAlpha(0.25);
-            if (altKm > 2000 && altKm < 35000) ringColor = Cesium.Color.fromCssColorString('#4488ff').withAlpha(0.25);
-            if (altKm >= 35000) ringColor = Cesium.Color.YELLOW.withAlpha(0.35);
-
-            self.viewer.entities.add({
-              id: orbitId,
-              show: isVisible,
-              polyline: {
-                positions: points,
-                width: 1,
-                material: new Cesium.PolylineGlowMaterialProperty({ glowPower: 0.15, color: ringColor }),
-                disableDepthTestDistance: 3000
-              }
-            });
-          } else if (orb) { 
-            orb.show = isVisible; 
-          }
+          // Satellite footprints + orbit rings: only created on-demand via selection
+          // (too expensive for 100+ satellites at once)
         } catch (err) {
           console.warn('[ENTITY SYSTEM] Error rendering satellite:', err);
         }
@@ -1233,7 +1292,7 @@ class Gotham3077System {
               }, false),
               width: 2,
               material: new Cesium.PolylineGlowMaterialProperty({ glowPower: 0.1, color: Cesium.Color.CYAN.withAlpha(0.4) }),
-              disableDepthTestDistance: 3000
+              disableDepthTestDistance: Number.POSITIVE_INFINITY
             }
           });
         } else if (te) {
@@ -1407,6 +1466,30 @@ class Gotham3077System {
     }
   }
 
+  _jammingStyle (e, d) {
+    // GPS jamming zones — pulsing red circles
+    if (!e.point) {
+      e.point = new Cesium.PointGraphics({
+        pixelSize: 10,
+        color: Cesium.Color.RED,
+        outlineColor: Cesium.Color.YELLOW,
+        outlineWidth: 2
+      });
+    }
+    if (!e.label) {
+      e.label = new Cesium.LabelGraphics({
+        text: 'GPS JAM' + (d.source ? ' [' + d.source + ']' : ''),
+        font: '10px "Share Tech Mono"',
+        fillColor: Cesium.Color.RED,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new Cesium.Cartesian2(0, -18),
+        distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 1000000)
+      });
+    }
+  }
+
   _financialStyle (e, d) {
     // Defense stocks/oil - scrolling ticker style (static billboard)
     var isOil = d.commodity || d.type === 'oil';
@@ -1415,17 +1498,17 @@ class Gotham3077System {
     var value = d.price || d.value || 0;
     var change = d.change || 0;
     var changeStr = change >= 0 ? '+' + change.toFixed(2) : change.toFixed(2);
-    
+
     if (!e.billboard) {
-      e.billboard = new Cesium.BillboardGraphics({ 
-        image: this._createTickerIcon(color, isOil), 
+      e.billboard = new Cesium.BillboardGraphics({
+        image: this._createTickerIcon(color, isOil),
         scale: 0.5,
         verticalOrigin: Cesium.VerticalOrigin.CENTER
       });
     }
     if (!e.label) {
-      e.label = new Cesium.LabelGraphics({ 
-        text: symbol + ' $' + value.toFixed(2) + ' (' + changeStr + '%)', 
+      e.label = new Cesium.LabelGraphics({
+        text: symbol + ' $' + value.toFixed(2) + ' (' + changeStr + '%)',
         font: '10px "Share Tech Mono"',
         fillColor: change >= 0 ? Cesium.Color.GREEN : Cesium.Color.RED,
         outlineColor: Cesium.Color.BLACK,
