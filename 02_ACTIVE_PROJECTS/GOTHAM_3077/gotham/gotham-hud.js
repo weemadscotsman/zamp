@@ -73,12 +73,16 @@ class GothamHUD {
       'gtog-ufo': { endpoint: '/api/live-data/slow', types: ['alien'], description: 'UFO/UAP Incident Tracker' }
     }
 
+    // ALL layers OFF by default — user activates what they want
     this.layerVisibility = {
-      flight: true, satellite: true, traffic: true,
-      transit: true, sea: true, cctv: true,
-      hazard: true, environment: true, intel: true,
-      cityMesh: false, space: true, github: false,
-      infrastructure: true, vectors: false
+      flight: false, satellite: false, traffic: false,
+      transit: false, sea: false, cctv: false,
+      hazard: false, environment: false, intel: false,
+      cityMesh: false, space: false, github: false,
+      infrastructure: false, vectors: false,
+      ship: false, news: false, frontline: false, outage: false,
+      kiwisdr: false, jamming: false, financial: false, alien: false,
+      night: false
     }
 
     this._initSettings()
@@ -92,7 +96,8 @@ class GothamHUD {
     this.viewer.camera.moveEnd.addEventListener(this._cameraMoveHandler)
 
     console.log('[GOTHAM] HUD v49.0 - SUPREME COMMAND READY')
-    setTimeout(() => this._autoEnableLayers(), 2000);
+    // Layers load on-demand when user clicks buttons (no auto-enable)
+    // setTimeout(() => this._autoEnableLayers(), 2000);
   }
 
   _initSettings() {
@@ -140,20 +145,24 @@ class GothamHUD {
       }
     }
 
-    const groupTypes = { 
-      hazard: ['earthquake', 'volcano', 'wildfire', 'gdacs', 'alert'], 
-      environment: ['weather', 'airquality', 'water', 'spacewx', 'river', 'carbon'], 
-      intel: ['crime', 'news', 'frontline', 'kiwisdr', 'financial', 'alien', 'jamming'], 
-      flight: ['flight', 'military'], 
-      sea: ['buoy', 'tide', 'maritime', 'ship'], 
-      transit: ['transit', 'bikeshare', 'evcharger'], 
-      satellite: ['satellite'], 
-      traffic: ['traffic'], 
-      cctv: ['cctv'], 
+    const groupTypes = {
+      hazard: ['earthquake', 'volcano', 'wildfire', 'gdacs', 'alert'],
+      environment: ['weather', 'airquality', 'water', 'spacewx', 'river', 'carbon'],
+      intel: ['crime', 'news', 'frontline', 'kiwisdr', 'financial', 'alien', 'jamming'],
+      flight: ['flight', 'military'],
+      sea: ['buoy', 'tide', 'maritime', 'ship'],
+      transit: ['transit', 'bikeshare', 'evcharger'],
+      satellite: ['satellite'],
+      traffic: ['traffic'],
+      cctv: ['cctv'],
       space: ['neo', 'fireball', 'star', 'meteor'],
       github: ['github'],
       infrastructure: ['infrastructure', 'outage'],
-      vectors: ['vector']
+      vectors: ['vector'],
+      // Individual sub-layer toggles
+      ship: ['ship'], news: ['news'], frontline: ['frontline'],
+      outage: ['outage'], kiwisdr: ['kiwisdr'], jamming: ['jamming'],
+      financial: ['financial'], alien: ['alien']
     };
     const matchTypes = groupTypes[type] || [type];
     
@@ -192,10 +201,10 @@ class GothamHUD {
         <div style="flex:2">
           <div class="section-header">LAYER CONTROL</div>
           <div style="display:flex; gap:4px; flex-wrap:wrap">
-            ${this._btn('AIR', 'gtop-air', true)} ${this._btn('SAT', 'gtop-sat', true)} ${this._btn('SEA', 'gtop-sea', true)}
-            ${this._btn('LAND', 'gtop-land', true)} ${this._btn('RAIL', 'gtop-rail', true)} ${this._btn('CCTV', 'gtop-cctv', true)}
-            ${this._btn('HAZARD', 'gtop-hazard', true)} ${this._btn('ENV', 'gtop-env', true)} ${this._btn('INTEL', 'gtop-intel', true)}
-            ${this._btn('INFRA', 'gtop-infra', true)} ${this._btn('SPACE', 'gtop-space', true)} ${this._btn('MESH', 'gtop-mesh', false)} ${this._btn('GITHUB', 'gtop-github', false)} ${this._btn('VECTORS', 'gtop-vectors', false)}
+            ${this._btn('AIR', 'gtop-air', false)} ${this._btn('SAT', 'gtop-sat', false)} ${this._btn('SEA', 'gtop-sea', false)}
+            ${this._btn('LAND', 'gtop-land', false)} ${this._btn('RAIL', 'gtop-rail', false)} ${this._btn('CCTV', 'gtop-cctv', false)}
+            ${this._btn('HAZARD', 'gtop-hazard', false)} ${this._btn('ENV', 'gtop-env', false)} ${this._btn('INTEL', 'gtop-intel', false)}
+            ${this._btn('INFRA', 'gtop-infra', false)} ${this._btn('SPACE', 'gtop-space', false)} ${this._btn('MESH', 'gtop-mesh', false)} ${this._btn('GITHUB', 'gtop-github', false)} ${this._btn('VECTORS', 'gtop-vectors', false)}
           </div>
         </div>
         <div style="flex:1">
@@ -215,11 +224,11 @@ class GothamHUD {
         <div class="panel-block">
           <div class="section-header">🔲 TACTICAL NETWORKS</div>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px">
-            ${this._btn('AIR/MILITARY', 'gtog-air', true)} ${this._btn('SATELLITES', 'gtog-sat', true)}
-            ${this._btn('SEA/BUOYS', 'gtog-sea', true)} ${this._btn('LAND TRAFFIC', 'gtog-land', true)}
-            ${this._btn('TRANSIT/RAIL', 'gtog-rail', true)} ${this._btn('CCTV FEEDS', 'gtog-cctv', true)}
-            ${this._btn('HAZARD DECK', 'gtog-hazard', true)} ${this._btn('ENVIRONMENT', 'gtog-env', true)}
-            ${this._btn('INTEL/CRIME', 'gtog-intel', true)} ${this._btn('SPACE INTEL', 'gtog-space', true)}
+            ${this._btn('AIR/MILITARY', 'gtog-air', false)} ${this._btn('SATELLITES', 'gtog-sat', false)}
+            ${this._btn('SEA/BUOYS', 'gtog-sea', false)} ${this._btn('LAND TRAFFIC', 'gtog-land', false)}
+            ${this._btn('TRANSIT/RAIL', 'gtog-rail', false)} ${this._btn('CCTV FEEDS', 'gtog-cctv', false)}
+            ${this._btn('HAZARD DECK', 'gtog-hazard', false)} ${this._btn('ENVIRONMENT', 'gtog-env', false)}
+            ${this._btn('INTEL/CRIME', 'gtog-intel', false)} ${this._btn('SPACE INTEL', 'gtog-space', false)}
             ${this._btn('CITY MESH', 'gtog-mesh', false)} ${this._btn('NIGHT MODE', 'gtog-night', false)}
             ${this._btn('GITHUB DEVS', 'gtog-github', false)} ${this._btn('VECTORS', 'gtog-vectors', false)}
           </div>
@@ -230,7 +239,7 @@ class GothamHUD {
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px">
             ${this._btn('SHIPS/AIS', 'gtog-ships', false)} ${this._btn('NEWS/GDELT', 'gtog-news', false)}
             ${this._btn('FRONTLINES', 'gtog-frontlines', false)} ${this._btn('OUTAGES', 'gtog-outages', false)}
-            ${this._btn('INFRASTRUCTURE', 'gtog-infra', true)} ${this._btn('KIWISDR', 'gtog-kiwi', false)}
+            ${this._btn('INFRASTRUCTURE', 'gtog-infra', false)} ${this._btn('KIWISDR', 'gtog-kiwi', false)}
             ${this._btn('JAMMING', 'gtog-jamming', false)} ${this._btn('DEFENSE', 'gtog-defense', false)}
           </div>
         </div>
@@ -298,6 +307,21 @@ class GothamHUD {
           <div id="ghud-entity-title" style="color:#fff; font-weight:bold; font-size:13px; margin-bottom:4px">STATUS: NO LOCK</div>
           <div id="ghud-entity-body" style="font-size:11px; color:#888;">Awaiting target acquisition...</div>
           ${this._btn('CAMERA LOCK', 'gtog-camlock', false)}
+        </div>
+
+        <div class="panel-block" style="background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.3)">
+          <div class="section-header" style="color:#00f0ff">🛜 OSINT MODULE</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px">
+            ${this._btn('USERNAME SCAN', 'sens-osint-username', false)}
+            ${this._btn('CVE LOOKUP', 'sens-osint-cve', false)}
+            ${this._btn('VIP TRACK', 'sens-osint-vip', false)}
+            ${this._btn('BREACH CHECK', 'sens-osint-breach', false)}
+            ${this._btn('INTERNET OUTAGES', 'sens-osint-outages', false)}
+            ${this._btn('FRONTLINES', 'sens-osint-frontlines', false)}
+          </div>
+          <div style="margin-top:8px;text-align:center">
+            <button id="sens-osint" class="btn-toggle" style="border-color:rgba(0,240,255,0.8);color:#fff;width:100%;padding:8px;cursor:pointer;border-radius:4px;font-family:inherit;font-size:11px;letter-spacing:2px;background:rgba(0,240,255,0.15);">🛜 OPEN FULL OSINT MODULE</button>
+          </div>
         </div>
 
         <div class="panel-block">
@@ -453,11 +477,21 @@ class GothamHUD {
       click('gtop-'+sh, () => s.toggleLayer(full, 'gtop-'+sh)); 
     });
 
-    ['ships','news','frontlines','outages','infrastructure','infra','kiwi','jamming','defense','ufo'].forEach(id => {
-      click('gtog-'+id, () => {
-        const types = s.apiMapping['gtog-'+id]?.types || ['intel'];
-        s.toggleLayer(types[0], 'gtog-'+id);
-      });
+    // Secondary layer buttons — map to correct layerVisibility key + entity types
+    const secondaryMap = {
+      'ships':    { visKey: 'ship',     types: ['ship'] },
+      'news':     { visKey: 'news',     types: ['news'] },
+      'frontlines': { visKey: 'frontline', types: ['frontline'] },
+      'outages':  { visKey: 'outage',   types: ['outage'] },
+      'infrastructure': { visKey: 'infrastructure', types: ['infrastructure'] },
+      'infra':    { visKey: 'infrastructure', types: ['infrastructure'] },
+      'kiwi':     { visKey: 'kiwisdr',  types: ['kiwisdr'] },
+      'jamming':  { visKey: 'jamming',  types: ['jamming'] },
+      'defense':  { visKey: 'financial', types: ['financial'] },
+      'ufo':      { visKey: 'alien',    types: ['alien'] }
+    };
+    Object.entries(secondaryMap).forEach(([id, cfg]) => {
+      click('gtog-'+id, () => s.toggleLayer(cfg.visKey, 'gtog-'+id));
     });
     click('zoom-ukraine', () => s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(31.1656, 48.3794, 1000000) }));
     click('zoom-taiwan', () => s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(120.9605, 23.6978, 1000000) }));
@@ -504,6 +538,102 @@ class GothamHUD {
 
     click('ghud-rec-btn', () => s.toggleRecording());
     click('ghud-play-btn', () => s.togglePlayback());
+
+    // Night mode toggle
+    click('gtog-night', () => {
+      s.layerVisibility.night = !s.layerVisibility.night;
+      s._toggleBtn('gtog-night', s.layerVisibility.night);
+      if (s.shaders) s.shaders.setMode(s.layerVisibility.night ? 'nvg' : 'normal');
+      s._sysLog('NIGHT MODE ' + (s.layerVisibility.night ? 'ENGAGED' : 'OFF'));
+    });
+
+    // Alien guide / ping (visual effect triggers)
+    click('gtog-alien-guide', () => { s._toggleBtn('gtog-alien-guide', true); s._sysLog('ALIEN GUIDE: Scanning anomalous signals...'); setTimeout(() => s._toggleBtn('gtog-alien-guide', false), 3000); });
+    click('gtog-alien-ping', () => { s._toggleBtn('gtog-alien-ping', true); s._sysLog('ALIEN PING: Broadcasting on all frequencies...'); setTimeout(() => s._toggleBtn('gtog-alien-ping', false), 3000); });
+
+    // Camera lock
+    click('gtog-camlock', () => {
+      const locked = !!s.viewer.scene.screenSpaceCameraController.enableInputs;
+      s.viewer.scene.screenSpaceCameraController.enableInputs = !locked;
+      s._toggleBtn('gtog-camlock', locked);
+      s._sysLog('CAMERA ' + (locked ? 'LOCKED' : 'UNLOCKED'));
+    });
+
+    // Neural trace / vol scan (sensor visualization triggers)
+    click('ghud-neural-trace', () => { s._toggleBtn('ghud-neural-trace', true); s._sysLog('NEURAL TRACE: Active'); setTimeout(() => s._toggleBtn('ghud-neural-trace', false), 5000); });
+    click('ghud-vol-scan', () => { s._toggleBtn('ghud-vol-scan', true); s._sysLog('VOLUMETRIC SCAN: Sweeping...'); setTimeout(() => s._toggleBtn('ghud-vol-scan', false), 5000); });
+
+    // Sensor array buttons — toggle visual indicators + log
+    ['lidar','radar','sonar','masint','elint','comint','sigint','humint','geoint','acint'].forEach(id => {
+      click('sens-'+id, () => {
+        const el = document.getElementById('sens-'+id);
+        const active = el && el.classList.toggle('active');
+        s._toggleBtn('sens-'+id, active);
+        s._sysLog('SENSOR: ' + id.toUpperCase() + ' ' + (active ? 'ONLINE' : 'OFFLINE'));
+      });
+    });
+
+    // OSINT overlay — opens the full OSINT panel
+    click('sens-osint', () => {
+      if (!window.gothamOSINTOverlay) {
+        window.gothamOSINTOverlay = new GothamOSINTOverlay();
+      }
+      window.gothamOSINTOverlay.toggle();
+      s._sysLog('OSINT MODULE: ' + (document.getElementById('gotham-osint-overlay')?.style.display !== 'none' ? 'OPENED' : 'CLOSED'));
+    });
+
+    // Quick OSINT tab buttons — open overlay and switch to specific tab
+    const osintTabMap = {
+      'sens-osint-username': 'username',
+      'sens-osint-cve': 'cve',
+      'sens-osint-vip': 'vip',
+      'sens-osint-breach': 'breach',
+      'sens-osint-outages': 'outages',
+      'sens-osint-frontlines': 'frontlines',
+    };
+    Object.entries(osintTabMap).forEach(([btnId, tabName]) => {
+      click(btnId, () => {
+        if (!window.gothamOSINTOverlay) {
+          window.gothamOSINTOverlay = new GothamOSINTOverlay();
+        }
+        window.gothamOSINTOverlay.show();
+        // Switch to the specific tab
+        const tabBtn = document.querySelector(`.osint-tab[data-tab="${tabName}"]`);
+        if (tabBtn) tabBtn.click();
+        s._sysLog('OSINT: ' + tabName.toUpperCase() + ' PANEL');
+      });
+    });
+
+    // Film stock buttons
+    ['kodak','ilford','fuji','cine'].forEach(id => {
+      click('film-'+id, () => {
+        ['kodak','ilford','fuji','cine'].forEach(fid => s._toggleBtn('film-'+fid, false));
+        s._toggleBtn('film-'+id, true);
+        const filmMap = { kodak: 'amber', ilford: 'neutral', fuji: 'normal', cine: 'cel' };
+        if (s.shaders && filmMap[id]) s.shaders.setMode(filmMap[id]);
+        s._sysLog('FILM: ' + id.toUpperCase());
+      });
+    });
+
+    // Lens FX buttons — IDs match HTML: ana, fish, tilt, bokeh, vig, flare
+    ['ana','fish','tilt','bokeh','vig','flare'].forEach(id => {
+      click('lens-'+id, () => {
+        ['ana','fish','tilt','bokeh','vig','flare'].forEach(lid => s._toggleBtn('lens-'+lid, false));
+        s._toggleBtn('lens-'+id, true);
+        s._sysLog('LENS: ' + id.toUpperCase());
+      });
+    });
+
+    // SCRIBE time buttons
+    click('gtime-now', () => { s.viewer.clock.currentTime = Cesium.JulianDate.now(); s._sysLog('TIME: NOW'); s._toggleBtn('gtime-now', true); s._toggleBtn('gtime-1h', false); s._toggleBtn('gtime-24h', false); });
+    click('gtime-1h', () => { s.viewer.clock.currentTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), -1, new Cesium.JulianDate()); s._sysLog('TIME: -1H'); s._toggleBtn('gtime-now', false); s._toggleBtn('gtime-1h', true); s._toggleBtn('gtime-24h', false); });
+    click('gtime-24h', () => { s.viewer.clock.currentTime = Cesium.JulianDate.addHours(Cesium.JulianDate.now(), -24, new Cesium.JulianDate()); s._sysLog('TIME: -24H'); s._toggleBtn('gtime-now', false); s._toggleBtn('gtime-1h', false); s._toggleBtn('gtime-24h', true); });
+
+    // Cinematic presets
+    click('pre-orbit', () => { s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(0, 0, 20000000), orientation: { heading: 0, pitch: Cesium.Math.toRadians(-90), roll: 0 } }); s._sysLog('PRESET: ORBITAL'); });
+    click('pre-street', () => { const c = s.viewer.camera.positionCartographic; s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(c.longitude), Cesium.Math.toDegrees(c.latitude), 500), orientation: { heading: s.viewer.camera.heading, pitch: Cesium.Math.toRadians(-15), roll: 0 } }); s._sysLog('PRESET: STREET'); });
+    click('pre-flyby', () => { const c = s.viewer.camera.positionCartographic; s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(c.longitude), Cesium.Math.toDegrees(c.latitude), 5000), orientation: { heading: Cesium.Math.toRadians(45), pitch: Cesium.Math.toRadians(-30), roll: 0 }, duration: 3 }); s._sysLog('PRESET: FLYBY'); });
+    click('pre-recon', () => { const c = s.viewer.camera.positionCartographic; s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(Cesium.Math.toDegrees(c.longitude), Cesium.Math.toDegrees(c.latitude), 50000), orientation: { heading: 0, pitch: Cesium.Math.toRadians(-90), roll: 0 } }); s._sysLog('PRESET: RECON'); });
   }
 
   _startTelemetry () {
@@ -563,10 +693,8 @@ class GothamHUD {
     const c = this.viewer.camera.positionCartographic; if (!c) return;
     this._sysLog(`POS: ${Cesium.Math.toDegrees(c.latitude).toFixed(4)}, ${Cesium.Math.toDegrees(c.longitude).toFixed(4)}`);
   }
-  _bindKeys () { 
-    document.addEventListener("keydown", (e) => { 
-      if (e.code === "KeyH") { ['gotham-hud-left','gotham-hud-right','gotham-hud-bottom','gotham-hud-top'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = el.style.display==='none'?'flex':'none'; }); } 
-    });
+  _bindKeys () {
+    // H key handled by index.html panel toggle system using .collapsed class
   }
   _initPanelLocks() {
     ['left', 'right', 'bottom', 'top'].forEach(p => {
@@ -576,10 +704,23 @@ class GothamHUD {
       lockBtn.addEventListener('click', (e) => { e.stopPropagation(); panel.classList.toggle('locked'); lockBtn.textContent = panel.classList.contains('locked') ? '🔒' : '🔓'; });
     });
   }
-  _autoEnableLayers() {
+  _autoEnableLayers(retryCount) {
     if (!this.entitySystem || !this.entitySystem._createEntitiesForTypes) return;
-    const groupTypes = { hazard:['earthquake','volcano','wildfire','gdacs','alert'], environment:['weather','airquality','water','spacewx','river','carbon'], intel:['crime','news','frontline','kiwisdr','financial','alien','jamming'], flight:['flight','military'], sea:['buoy','tide','maritime','ship'], transit:['transit','bikeshare','evcharger'], satellite:['satellite'], traffic:['traffic'], cctv:['cctv'], space:['neo','fireball','star','meteor'], github:['github'], infrastructure:['infrastructure','outage'], vectors:['vector'] };
+    const groupTypes = { hazard:['earthquake','volcano','wildfire','gdacs','alert'], environment:['weather','airquality','water','spacewx','river','carbon'], intel:['crime','news','frontline','kiwisdr','financial','alien','jamming'], flight:['flight','military'], sea:['buoy','tide','maritime','ship'], transit:['transit','bikeshare','evcharger'], satellite:['satellite'], traffic:['traffic'], cctv:['cctv'], space:['neo','fireball','star','meteor'], github:['github'], infrastructure:['infrastructure','outage'], vectors:['vector'], ship:['ship'], news:['news'], frontline:['frontline'], outage:['outage'], kiwisdr:['kiwisdr'], jamming:['jamming'], financial:['financial'], alien:['alien'] };
+
+    // Check if dataCache has any data
+    const cache = this.entitySystem.dataCache;
+    const hasData = cache && Object.keys(cache).some(k => Array.isArray(cache[k]) && cache[k].length > 0);
+
+    if (!hasData && (retryCount || 0) < 10) {
+      // No data yet — retry in 3 seconds (data may still be loading)
+      console.log('[HUD] No data in cache yet, retrying auto-enable in 3s (attempt ' + ((retryCount || 0) + 1) + ')');
+      setTimeout(() => this._autoEnableLayers((retryCount || 0) + 1), 3000);
+      return;
+    }
+
     Object.entries(this.layerVisibility).forEach(([layer, enabled]) => { if (enabled && layer !== 'cityMesh') { const matchTypes = groupTypes[layer] || [layer]; this.entitySystem._createEntitiesForTypes(matchTypes, layer); } });
+    console.log('[HUD] Auto-enable layers complete, cache keys:', cache ? Object.keys(cache).filter(k => Array.isArray(cache[k]) && cache[k].length > 0).join(', ') : 'empty');
   }
 }
 
