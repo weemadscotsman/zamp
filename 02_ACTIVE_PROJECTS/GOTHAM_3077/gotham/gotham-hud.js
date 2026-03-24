@@ -213,6 +213,7 @@ class GothamHUD {
             ${this._btn('ZOOM', 'gtop-zoom', false)} ${this._btn('VOICE', 'gtop-voice', true)} ${this._btn('SECURE', 'gtop-secure', true)} ${this._btn('CCTV', 'gtop-cctv-hook', false)}
           </div>
           <div style="font-size:9px; color:#666; margin-top:8px">FPS: <span id="gtop-fps">0</span> | IOH_KEY: <span id="ghud-ion-key">0x7F...A2</span></div>
+          <div style="font-size:9px; color:#ff0; margin-top:6px">MODE: <span id="ghud-country-mode" style="color:#fff">GLOBAL</span></div>
         </div>
       </div>`;
 
@@ -278,9 +279,21 @@ class GothamHUD {
           ${this._slider('Drain Delay (ms)', 'ghud-drain', 100, 50, 1000, 50)}
         </div>
         <div class="panel-block">
-          <div class="section-header">🎯 CONFLICT ZONE QUICK‑ZOOM</div>
+          <div class="section-header">🎯 THEATER QUICK‑ZOOM</div>
           <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px">
-            ${this._btn('UKRAINE', 'zoom-ukraine', false)} ${this._btn('TAIWAN', 'zoom-taiwan', false)} ${this._btn('RED SEA', 'zoom-redsea', false)}
+            ${this._btn('GLOBAL', 'zoom-global', false)} ${this._btn('UKRAINE', 'zoom-ukraine', false)} ${this._btn('TAIWAN', 'zoom-taiwan', false)}
+            ${this._btn('S.CHINA SEA', 'zoom-south_china_sea', false)} ${this._btn('RUSSIA', 'zoom-russia', false)} ${this._btn('IRAN', 'zoom-iran', false)}
+            ${this._btn('SYRIA', 'zoom-syria', false)} ${this._btn('ISRAEL', 'zoom-israel', false)} ${this._btn('USA', 'zoom-usa', false)}
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px; margin-top:4px">
+            ${this._btn('CHINA', 'zoom-china', false)} ${this._btn('UK', 'zoom-uk', false)} ${this._btn('MIDEAST', 'zoom-mideast', false)}
+            ${this._btn('EUROPE', 'zoom-europe', false)} ${this._btn('SUDAN', 'zoom-s_sudan', false)} ${this._btn('KOREA', 'zoom-n_korea', false)}
+          </div>
+        </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:4px">
+            ${this._btn('UKRAINE', 'zoom-ukraine', false)} ${this._btn('TAIWAN', 'zoom-taiwan', false)} ${this._btn('S.CHINA SEA', 'zoom-south_china_sea', false)}
+            ${this._btn('RUSSIA', 'zoom-russia', false)} ${this._btn('IRAN', 'zoom-iran', false)} ${this._btn('SYRIA', 'zoom-syria', false)}
+            ${this._btn('ISRAEL', 'zoom-israel', false)} ${this._btn('USA', 'zoom-usa', false)} ${this._btn('CHINA', 'zoom-china', false)}
           </div>
         </div>
       </div>`;
@@ -310,17 +323,21 @@ class GothamHUD {
         </div>
 
         <div class="panel-block" style="background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.3)">
-          <div class="section-header" style="color:#00f0ff">🛜 OSINT MODULE</div>
+          <div class="section-header" style="color:#00f0ff">🛜 INTELLIGENCE OVERLAYS — RESULTS ON THE GLOBE</div>
           <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px">
-            ${this._btn('USERNAME SCAN', 'sens-osint-username', false)}
-            ${this._btn('CVE LOOKUP', 'sens-osint-cve', false)}
-            ${this._btn('VIP TRACK', 'sens-osint-vip', false)}
-            ${this._btn('BREACH CHECK', 'sens-osint-breach', false)}
-            ${this._btn('INTERNET OUTAGES', 'sens-osint-outages', false)}
-            ${this._btn('FRONTLINES', 'sens-osint-frontlines', false)}
+            ${this._btn('USERNAME → GLOBE', 'intel-username', false)}
+            ${this._btn('VIP TRACK → GLOBE', 'intel-vip', false)}
+            ${this._btn('CVE → GLOBE', 'intel-cve', false)}
+            ${this._btn('BREACH → GLOBE', 'intel-breach', false)}
+            ${this._btn('GPS JAMMING', 'intel-jamming', false)}
+            ${this._btn('CLEAR INTEL', 'intel-clear', false)}
+          </div>
+          <div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            ${this._btn('OUTAGES', 'intel-outages', false)}
+            ${this._btn('FRONTLINES', 'intel-frontlines', false)}
           </div>
           <div style="margin-top:8px;text-align:center">
-            <button id="sens-osint" class="btn-toggle" style="border-color:rgba(0,240,255,0.8);color:#fff;width:100%;padding:8px;cursor:pointer;border-radius:4px;font-family:inherit;font-size:11px;letter-spacing:2px;background:rgba(0,240,255,0.15);">🛜 OPEN FULL OSINT MODULE</button>
+            <button id="sens-osint" class="btn-toggle" style="border-color:rgba(0,240,255,0.8);color:#fff;width:100%;padding:8px;cursor:pointer;border-radius:4px;font-family:inherit;font-size:11px;letter-spacing:2px;background:rgba(0,240,255,0.15);">🛜 OSINT PANEL</button>
           </div>
         </div>
 
@@ -493,9 +510,21 @@ class GothamHUD {
     Object.entries(secondaryMap).forEach(([id, cfg]) => {
       click('gtog-'+id, () => s.toggleLayer(cfg.visKey, 'gtog-'+id));
     });
-    click('zoom-ukraine', () => s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(31.1656, 48.3794, 1000000) }));
-    click('zoom-taiwan', () => s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(120.9605, 23.6978, 1000000) }));
-    click('zoom-redsea', () => s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(40.0, 20.0, 2000000) }));
+    click('zoom-ukraine', () => { if (window.countryIntel) window.countryIntel.enterCountry('UKRAINE'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(31.1656, 48.3794, 1000000) }); });
+    click('zoom-taiwan', () => { if (window.countryIntel) window.countryIntel.enterCountry('TAIWAN'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(120.9605, 23.6978, 1000000) }); });
+    click('zoom-south_china_sea', () => { if (window.countryIntel) window.countryIntel.enterCountry('SOUTH_CHINA_SEA'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(113, 13, 4000000) }); });
+    click('zoom-russia', () => { if (window.countryIntel) window.countryIntel.enterCountry('RUSSIA'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(60, 65, 15000000) }); });
+    click('zoom-iran', () => { if (window.countryIntel) window.countryIntel.enterCountry('IRAN'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(53, 33, 5000000) }); });
+    click('zoom-syria', () => { if (window.countryIntel) window.countryIntel.enterCountry('SYRIA'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(38, 35, 2000000) }); });
+    click('zoom-israel', () => { if (window.countryIntel) window.countryIntel.enterCountry('ISRAEL'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(35, 31, 1500000) }); });
+    click('zoom-usa', () => { if (window.countryIntel) window.countryIntel.enterCountry('USA'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(-98, 38, 10000000) }); });
+    click('zoom-china', () => { if (window.countryIntel) window.countryIntel.enterCountry('CHINA'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(105, 35, 8000000) }); });
+    click('zoom-uk', () => { if (window.countryIntel) window.countryIntel.enterCountry('UK'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(-3, 54, 2500000) }); });
+    click('zoom-europe', () => { if (window.countryIntel) window.countryIntel.enterCountry('MEDITERRANEAN'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(15, 37, 6000000) }); });
+    click('zoom-mideast', () => { if (window.countryIntel) window.countryIntel.enterCountry('IRAQ'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(44, 33, 3000000) }); });
+    click('zoom-s_sudan', () => { if (window.countryIntel) window.countryIntel.enterCountry('S_SUDAN'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(30, 8, 3000000) }); });
+    click('zoom-n_korea', () => { if (window.countryIntel) window.countryIntel.enterCountry('N_KOREA'); else s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(127, 40, 1000000) }); });
+    click('zoom-global', () => { if (window.countryIntel) window.countryIntel._exitCountryMode(); s.viewer.camera.flyTo({ destination: Cesium.Cartesian3.fromDegrees(-40, 20, 18000000) }); s._sysLog('VIEW: GLOBAL'); });
 
     const toggleHook = (hook, btn1, btn2) => {
       s.hooks[hook] = !s.hooks[hook];
@@ -508,6 +537,17 @@ class GothamHUD {
     click('ghook-voice', () => toggleHook('voiceAlerts', 'ghook-voice', 'gtop-voice'));
     click('ghook-secure', () => toggleHook('secureUplink', 'ghook-secure', 'gtop-secure'));
     click('ghook-cctv', () => toggleHook('autoCCTV', 'ghook-cctv', 'gtop-cctv-hook'));
+    
+    // Accountability Engine - Public Camera Access
+    click('gtog-account', () => {
+      if (window.gothamAccountability) {
+        window.gothamAccountability.showCamerasOnGlobe();
+        s._sysLog('ACCOUNTABILITY: All cameras on globe');
+      } else {
+        s._sysLog('ACCOUNTABILITY: Engine not loaded');
+      }
+    });
+    
     click('ghook-spawn', () => {
       if (window.agentController) {
         const c = s.viewer.camera.positionCartographic;
@@ -582,26 +622,55 @@ class GothamHUD {
       s._sysLog('OSINT MODULE: ' + (document.getElementById('gotham-osint-overlay')?.style.display !== 'none' ? 'OPENED' : 'CLOSED'));
     });
 
-    // Quick OSINT tab buttons — open overlay and switch to specific tab
-    const osintTabMap = {
-      'sens-osint-username': 'username',
-      'sens-osint-cve': 'cve',
-      'sens-osint-vip': 'vip',
-      'sens-osint-breach': 'breach',
-      'sens-osint-outages': 'outages',
-      'sens-osint-frontlines': 'frontlines',
-    };
-    Object.entries(osintTabMap).forEach(([btnId, tabName]) => {
-      click(btnId, () => {
-        if (!window.gothamOSINTOverlay) {
-          window.gothamOSINTOverlay = new GothamOSINTOverlay();
-        }
-        window.gothamOSINTOverlay.show();
-        // Switch to the specific tab
-        const tabBtn = document.querySelector(`.osint-tab[data-tab="${tabName}"]`);
-        if (tabBtn) tabBtn.click();
-        s._sysLog('OSINT: ' + tabName.toUpperCase() + ' PANEL');
-      });
+    // INTELLIGENCE OVERLAY BUTTONS — results appear ON THE GLOBE
+    // These call the GothamIntelligenceBackend → entities on Cesium globe
+
+    click('intel-username', () => {
+      const target = window.prompt('USERNAME TO SCAN (21 platforms):\n\nExamples: elonmusk, realdonaldtrump, kimkardashian');
+      if (!target || !target.trim()) return;
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.scanUsername(target.trim());
+    });
+
+    click('intel-vip', () => {
+      const target = window.prompt('VIP / AIRCRAFT TO TRACK:\n\nExamples: Trump, Putin, Elon, Roman Abramovich, Government of Russia, Government of Iran');
+      if (!target || !target.trim()) return;
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.trackVIP(target.trim());
+    });
+
+    click('intel-cve', () => {
+      const target = window.prompt('CVE TO DISPLAY ON GLOBE:\n\nExamples: CVE-2021-44228 (Log4j), CVE-2017-0144 (EternalBlue), CVE-2014-0160 (Heartbleed)');
+      if (!target || !target.trim()) return;
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.showCVE(target.trim().toUpperCase());
+    });
+
+    click('intel-breach', () => {
+      const target = window.prompt('EMAIL TO CHECK FOR BREACHES:\n\nExample: target@email.com');
+      if (!target || !target.trim()) return;
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.checkBreach(target.trim());
+    });
+
+    click('intel-jamming', () => {
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.showGPSJamming();
+    });
+
+    click('intel-outages', () => {
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.showOutages();
+    });
+
+    click('intel-frontlines', () => {
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.showFrontlines();
+    });
+
+    click('intel-clear', () => {
+      if (!window.gothamIntel) { s._sysLog('ERROR: Intelligence backend not loaded'); return; }
+      window.gothamIntel.clearAll();
     });
 
     // Film stock buttons
