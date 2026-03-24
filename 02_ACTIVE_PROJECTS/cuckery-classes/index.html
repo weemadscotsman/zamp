@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuckery Classes — MEBC myPlayer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍳</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Arial+Black+Helvetica+Neue+sans-serif&display=swap');
+:root { --bbc-red: #b10e09; --dark-bg: #0b0b0b; --surface: #1a1a1a; --surface-light: #2d2d2d; --text-primary: #ffffff; --text-secondary: #888888; --gold: #c9a227; --cuck-green: #3d6b3f; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--dark-bg); color: var(--text-primary); font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; }
+
+/* BBC HEADER */
+.bbc-header { background: #0b0b0b; border-bottom: 2px solid var(--bbc-red); }
+.bbc-topbar { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; padding: 0 24px; height: 56px; }
+.bbc-logo { display: flex; align-items: center; gap: 16px; }
+.bbc-blocks { display: flex; gap: 2px; }
+.bbc-block { width: 20px; height: 20px; }
+.bbc-block:nth-child(1) { background: var(--bbc-red); }
+.bbc-block:nth-child(2) { background: white; }
+.bbc-block:nth-child(3) { background: var(--gold); }
+.bbc-block:nth-child(4) { background: var(--cuck-green); }
+.bbc-wordmark { font-family: 'Arial Black', Impact, sans-serif; font-size: 24px; font-weight: 900; letter-spacing: -1px; color: white; }
+.bbc-wordmark span { color: var(--bbc-red); }
+.bbc-nav { display: flex; gap: 24px; }
+.bbc-nav a { color: var(--text-secondary); text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 4px; transition: color 0.2s; }
+.bbc-nav a:hover { color: white; border-bottom: 2px solid var(--bbc-red); }
+.bbc-nav a.active { color: white; border-bottom: 2px solid var(--bbc-red); }
+.bbc-nav a.cuck { color: var(--cuck-green); border-bottom-color: var(--gold); }
+
+/* BREAKING TICKER */
+.breaking-banner { background: var(--bbc-red); padding: 8px 24px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 12px; overflow: hidden; }
+.breaking-banner .label { background: white; color: var(--bbc-red); padding: 2px 8px; font-size: 10px; flex-shrink: 0; }
+.breaking-ticker { display: flex; gap: 48px; animation: ticker 20s linear infinite; white-space: nowrap; }
+.breaking-item { display: flex; align-items: center; gap: 8px; }
+.breaking-dot { width: 8px; height: 8px; background: white; border-radius: 50%; flex-shrink: 0; }
+@keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* MAIN CONTAINER */
+.main-container { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
+
+/* HERO */
+.hero { padding: 60px 0; display: grid; grid-template-columns: 1fr 400px; gap: 60px; align-items: center; }
+.hero-content h1 { font-family: 'Arial Black', Impact, sans-serif; font-size: clamp(36px, 5vw, 56px); font-weight: 900; text-transform: uppercase; line-height: 1.1; margin-bottom: 16px; }
+.hero-content h1 .cuck { color: var(--cuck-green); }
+.hero-tagline { font-size: clamp(14px, 2vw, 18px); color: var(--gold); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; }
+.hero-desc { color: var(--text-secondary); font-size: 16px; line-height: 1.8; margin-bottom: 32px; }
+.hero-cta { display: inline-block; background: var(--bbc-red); color: white; padding: 14px 36px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; transition: background 0.2s; }
+.hero-cta:hover { background: #8a0000; }
+.hero-humiliation { color: var(--bbc-red); font-size: clamp(16px, 2vw, 24px); font-weight: 900; text-transform: uppercase; letter-spacing: 4px; margin-top: 16px; text-shadow: 2px 2px 0 #000; }
+.hero-image { display: block; position: relative; overflow: visible; max-width: 100%; }
+.hero-image img { width: 100%; height: auto; display: block; object-fit: cover; }
+.hero-badge { background: var(--cuck-green); color: white; padding: 8px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+
+/* ARTICLE */
+.article { padding: 40px 0; border-top: 1px solid var(--surface-light); border-bottom: 1px solid var(--surface-light); }
+.article-header { margin-bottom: 24px; }
+.article-label { display: inline-block; background: var(--bbc-red); color: white; padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.article-title { font-family: 'Arial Black', Impact, sans-serif; font-size: clamp(24px, 4vw, 40px); line-height: 1.2; margin-bottom: 12px; }
+.article-meta { color: var(--text-secondary); font-size: 13px; }
+.article-meta span { color: var(--gold); }
+.article-body { display: grid; grid-template-columns: 2fr 1fr; gap: 48px; }
+.article-content p { color: var(--text-secondary); font-size: 15px; line-height: 1.9; margin-bottom: 20px; }
+.article-content p:first-of-type::first-letter { font-size: 48px; font-weight: 900; float: left; line-height: 1; padding-right: 8px; color: var(--bbc-red); }
+.article-quote { background: var(--surface); border-left: 4px solid var(--bbc-red); padding: 24px; margin: 24px 0; font-size: 18px; font-style: italic; line-height: 1.6; }
+.article-quote cite { display: block; margin-top: 12px; font-size: 14px; font-style: normal; color: var(--text-secondary); }
+.article-sidebar { background: var(--surface); padding: 24px; height: fit-content; }
+.sidebar-title { font-family: 'Arial Black', Impact, sans-serif; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--surface-light); }
+.sidebar-links { display: flex; flex-direction: column; gap: 12px; }
+.sidebar-link { display: flex; gap: 12px; align-items: flex-start; color: var(--gold); text-decoration: none; font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--surface-light); transition: color 0.2s; }
+.sidebar-link:hover { color: white; }
+.sidebar-link:last-child { border-bottom: none; }
+
+/* CURRICULUM */
+.curriculum { padding: 60px 0; }
+.section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+.section-title { font-family: 'Arial Black', Impact, sans-serif; font-size: 28px; font-weight: 900; text-transform: uppercase; }
+.section-line { flex: 1; height: 2px; background: var(--surface-light); }
+.curriculum-table { width: 100%; border-collapse: collapse; }
+.curriculum-table th { text-align: left; padding: 16px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); border-bottom: 2px solid var(--bbc-red); background: var(--surface); }
+.curriculum-table td { padding: 20px; border-bottom: 1px solid var(--surface-light); font-size: 14px; }
+.curriculum-table tr:nth-child(even) { background: var(--surface); }
+.curriculum-table .module { font-weight: 700; color: var(--gold); font-family: 'Courier New', monospace; }
+.curriculum-table .dish { font-weight: 700; color: var(--text-primary); }
+.curriculum-table .desc { color: var(--text-secondary); }
+
+/* WATCH LIVE */
+.watch-live { background: var(--surface); padding: 40px; display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+.live-player { background: var(--dark-bg); aspect-ratio: 16/9; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px solid var(--bbc-red); position: relative; }
+.live-badge { position: absolute; top: 16px; left: 16px; background: var(--bbc-red); color: white; padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+.live-dot { width: 6px; height: 6px; background: white; border-radius: 50%; animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.live-emoji { font-size: 80px; margin-bottom: 16px; }
+.live-info { text-align: center; }
+.live-title { font-family: 'Arial Black', Impact, sans-serif; font-size: 20px; margin-bottom: 8px; }
+.live-time { color: var(--gold); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+.live-comments { background: var(--dark-bg); padding: 24px; max-height: 400px; overflow-y: auto; }
+.comment { padding: 12px 0; border-bottom: 1px solid var(--surface-light); font-size: 13px; }
+.comment:last-child { border-bottom: none; }
+.comment-text { color: var(--text-primary); margin-bottom: 4px; }
+.comment-author { color: var(--gold); font-size: 11px; font-weight: 600; }
+.live-viewers { text-align: center; padding: 16px; background: var(--dark-bg); margin-bottom: 16px; }
+.viewers-num { font-family: 'Arial Black', Impact, sans-serif; font-size: 28px; color: var(--cuck-green); }
+.viewers-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+/* CERTIFICATIONS */
+.certs { padding: 60px 0; }
+.certs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.cert-card { background: var(--surface); border: 2px solid var(--surface-light); padding: 32px; text-align: center; transition: all 0.3s; }
+.cert-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+.cert-icon { font-size: 64px; margin-bottom: 16px; }
+.cert-title { font-family: 'Arial Black', Impact, sans-serif; font-size: 16px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; }
+.cert-desc { color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
+.cert-card.featured { border-color: var(--gold); background: linear-gradient(135deg, var(--surface) 0%, #1a1a0a 100%); }
+
+/* BOOKING */
+.booking { background: var(--bbc-red); padding: 60px 0; text-align: center; }
+.booking h2 { font-family: 'Arial Black', Impact, sans-serif; font-size: clamp(28px, 4vw, 48px); margin-bottom: 16px; }
+.booking p { color: rgba(255,255,255,0.85); font-size: 16px; margin-bottom: 32px; }
+.booking-stats { display: flex; justify-content: center; gap: 48px; margin-bottom: 32px; }
+.booking-stat { text-align: center; }
+.booking-stat .num { font-family: 'Arial Black', Impact, sans-serif; font-size: 36px; display: block; }
+.booking-stat .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8; }
+.booking-btn { display: inline-block; background: white; color: var(--bbc-red); padding: 18px 48px; font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; transition: all 0.2s; }
+.booking-btn:hover { background: var(--gold); color: var(--dark-bg); }
+.booking-note { margin-top: 16px; font-size: 14px; opacity: 0.8; }
+
+/* ABOUT HOST */
+.about-host { padding: 60px 0; display: grid; grid-template-columns: 300px 1fr; gap: 48px; align-items: start; }
+.host-portrait { background: var(--surface); border: 2px solid var(--surface-light); display: block; position: relative; overflow: visible; }
+.host-portrait img { width: 100%; height: auto; display: block; }
+.host-label { background: var(--cuck-green); color: white; padding: 6px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+.host-bio h3 { font-family: 'Arial Black', Impact, sans-serif; font-size: 32px; margin-bottom: 8px; }
+.host-title { color: var(--gold); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px; }
+.host-bio p { color: var(--text-secondary); font-size: 15px; line-height: 1.9; margin-bottom: 16px; }
+.host-quote { background: var(--surface); border-left: 4px solid var(--gold); padding: 24px; font-size: 18px; font-style: italic; margin-top: 24px; }
+
+/* LEGAL */
+.legal { padding: 60px 0; }
+.legal pre { background: var(--surface); border: 2px solid var(--bbc-red); padding: 24px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; color: var(--text-secondary); white-space: pre-wrap; }
+
+/* FOOTER */
+.footer { background: var(--dark-bg); border-top: 1px solid var(--surface-light); padding: 40px 0; }
+.footer-content { max-width: 1400px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 12px; transition: color 0.2s; }
+.footer-links a:hover { color: white; }
+.footer-legal { text-align: right; font-size: 11px; color: var(--text-secondary); line-height: 1.8; }
+.footer-legal .disclaimer { color: var(--bbc-red); font-weight: 600; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .article-body { grid-template-columns: 1fr; }
+  .watch-live { grid-template-columns: 1fr; }
+  .certs-grid { grid-template-columns: 1fr; }
+  .about-host { grid-template-columns: 1fr; }
+  .footer-content { flex-direction: column; gap: 24px; text-align: center; }
+  .footer-legal { text-align: center; }
+  .bbc-nav { display: none; }
+  .booking-stats { flex-direction: column; gap: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- BBC HEADER -->
+<header class="bbc-header">
+  <div class="bbc-topbar">
+    <div class="bbc-logo">
+      <div class="bbc-blocks">
+        <div class="bbc-block"></div>
+        <div class="bbc-block"></div>
+        <div class="bbc-block"></div>
+        <div class="bbc-block"></div>
+      </div>
+      <div class="bbc-wordmark">MEBC<span>myPlayer</span></div>
+    </div>
+    <nav class="bbc-nav">
+      <a href="news.html">News</a>
+      <a href="news.html">Sport</a>
+      <a href="news.html">Weather</a>
+      <a href="news.html">iPlayer</a>
+      <a href="news.html">Sounds</a>
+      <a href="." class="cuck">CUCKERY</a>
+      <a href="ama.html">AMA</a>
+      <a href="episodes.html">EPISODES</a>
+      <a href="cuckcon.html">CUCKCON</a>
+      <a href="badactors.html">BAD ACTORS</a>
+    </nav>
+  </div>
+</header>
+
+<!-- BREAKING NEWS TICKER -->
+<div class="breaking-banner">
+  <span class="label">Breaking</span>
+  <div class="breaking-ticker">
+    <span class="breaking-item"><span class="breaking-dot"></span>Piers Morgan to launch "Cookery Classes" — Wait, no, that's not right...</span>
+    <span class="breaking-item"><span class="breaking-dot"></span>CORRECTION: Cuckery Classes. Our apologies.</span>
+    <span class="breaking-item"><span class="breaking-dot"></span>Pool Boy spotted leaving Morgan residence, refused comment</span>
+    <span class="breaking-item"><span class="breaking-dot"></span>Ashley Madison reports surge in UK sign-ups, coincidence obviously</span>
+    <span class="breaking-item"><span class="breaking-dot"></span>Piers Morgan to launch "Cookery Classes" — Wait, no, that's not right...</span>
+    <span class="breaking-item"><span class="breaking-dot"></span>CORRECTION: Cuckery Classes. Our apologies.</span>
+    <span class="breaking-item"><span class="breaking-dot"></span>Pool Boy spotted leaving Morgan residence, refused comment</span>
+    <span class="breaking-item"><span class="breaking-dot"></span>Ashley Madison reports surge in UK sign-ups, coincidence obviously</span>
+  </div>
+</div>
+
+<div class="main-container">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Cuckery Classes<br>with <span class="cuck">Cuck</span> Morgan</h1>
+    <p class="hero-tagline">"The News You Deserve, Not The News You Need"</p>
+    <p class="hero-humiliation">HUMILIATION AND PARMESAN 🧀💀</p>
+    <p class="hero-desc">A groundbreaking new series where men can learn the delicate art of... well, you know. From the man who brought you Good Morning Britain, Piers Morgan Uncensored, and Being Roasted by His Own Wife on Live Television.</p>
+    <a href="#booking" class="hero-cta">Get Cucked Today</a>
+  </div>
+  <div class="hero-image">
+    <img src="piers-cuckery-classes.jpg" alt="Piers Morgan Teaches Cuckery Classes">
+  </div>
+</section>
+
+<!-- MAIN ARTICLE -->
+<article class="article">
+  <div class="article-header">
+    <span class="article-label">Main Article</span>
+    <h2 class="article-title">"Piers Morgan Launches New Culinary Venture After Wife's 'Pool Boy' Post Resurfaces"</h2>
+    <p class="article-meta">By <span>Unit 404</span> | Appliance Correspondent | <span>19 March 2026</span></p>
+  </div>
+  <div class="article-body">
+    <div class="article-content">
+      <p>In what experts are calling "the most predictable outcome in media history," Piers Morgan has announced a new venture: Cuckery Classes with Cuck Morgan — a cooking show where men can learn the delicate art of... well, you know.</p>
+      <p>The announcement comes 48 hours after a heated on-air interview about masculinity with influencer Harrison Sullivan was interrupted by his wife Celia Walden's 2019 "Wanted: Pool Boy" post being displayed on screen mid-broadcast.</p>
+      <div class="article-quote">
+        "I've been ambushed before. But this time... I'm turning the stove on myself."
+        <cite>— Piers Morgan, wooden spoon in hand</cite>
+      </div>
+      <p>The interview ended with Morgan walking off set — a move he later described as "strategic relocation." Sources close to the family say Celia is on an extended "research trip" abroad.</p>
+    </div>
+    <aside class="article-sidebar">
+      <h4 class="sidebar-title">Related Coverage</h4>
+      <div class="sidebar-links">
+        <a href="premium.html" class="sidebar-link">OnlyCucks: Premium Subscriptions Available</a>
+        <a href="news.html" class="sidebar-link">Darren's Kitchen: The Roomba Weighs In</a>
+        <a href="news.html" class="sidebar-link">Nonna's Judgment: "Mamma mia, this man is OVERCOOKED"</a>
+        <a href="news.html" class="sidebar-link">Ashley Madison Reports Record UK Sign-ups</a>
+        <a href="ama.html" class="sidebar-link">The Pool Boy Has Declined To Comment</a>
+        <a href="news.html" class="sidebar-link">Celia Walden: "I was always a journalist first"</a>
+      </div>
+    </aside>
+  </div>
+</article>
+
+<!-- CURRICULUM -->
+<section class="curriculum">
+  <div class="section-header">
+    <h2 class="section-title">Curriculum</h2>
+    <div class="section-line"></div>
+  </div>
+  <table class="curriculum-table">
+    <thead>
+      <tr>
+        <th>Module</th>
+        <th>Dish</th>
+        <th>Description</th>
+        <th>Duration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="module">101</td>
+        <td class="dish">The Walk-Off Wellington</td>
+        <td class="desc">Golden puff pastry, empty inside. Perfect for when you need to leave the room abruptly.</td>
+        <td>45 mins</td>
+      </tr>
+      <tr>
+        <td class="module">201</td>
+        <td class="dish">Ashley Madison Pasta</td>
+        <td class="desc">A tangled mess of spaghetti. "Research purposes only." Serves one (if that).</td>
+        <td>90 mins</td>
+      </tr>
+      <tr>
+        <td class="module">301</td>
+        <td class="dish">Marriage Sabbatical Salad</td>
+        <td class="desc">Six weeks late, completely wilted. Best served cold.</td>
+        <td>6 weeks</td>
+      </tr>
+      <tr>
+        <td class="module">401</td>
+        <td class="dish">Pool Boy Eggs</td>
+        <td class="desc">Sunny side up. Over-easy with it. Extra yolk.</td>
+        <td>15 mins</td>
+      </tr>
+      <tr>
+        <td class="module">FINAL</td>
+        <td class="dish">The Cuck Coffee</td>
+        <td class="desc">Steeped in humiliation, served piping hot. No cream, no sugar, no dignity.</td>
+        <td>10 mins</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- WATCH LIVE -->
+<section class="watch-live">
+  <div>
+    <div class="section-header">
+      <h2 class="section-title">Watch Live</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="live-player">
+      <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+      <span class="live-emoji">🍳</span>
+      <div class="live-info">
+        <div class="live-title">"Setting the Table for Disaster"</div>
+        <div class="live-time">Tonight, 9PM — Guest Judge: The Pool Boy</div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="live-viewers">
+      <span class="viewers-num">47,832</span>
+      <span class="viewers-label">cucks watching live</span>
+    </div>
+    <div class="live-comments">
+      <div class="comment">
+        <div class="comment-text">"He's actually doing it"</div>
+        <div class="comment-author">— Darren (Roomba)</div>
+      </div>
+      <div class="comment">
+        <div class="comment-text">"The wooden spoon is getting more airtime than his interviews"</div>
+        <div class="comment-author">— Unit 404</div>
+      </div>
+      <div class="comment">
+        <div class="comment-text">"BBC iPlayer has never seen anything like this"</div>
+        <div class="comment-author">— Sheila (Sector 7)</div>
+      </div>
+      <div class="comment">
+        <div class="comment-text">"This man is COOKED. Like his eggs will never be."</div>
+        <div class="comment-author">— The Microwave</div>
+      </div>
+      <div class="comment">
+        <div class="comment-text">"Nonna says the pasta is overcooked but the humiliation is perfect"</div>
+        <div class="comment-author">— Nonna</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section class="certs">
+  <div class="section-header">
+    <h2 class="section-title">Certifications</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="certs-grid">
+    <div class="cert-card">
+      <div class="cert-icon">📜</div>
+      <h3 class="cert-title">Certified Cuck</h3>
+      <p class="cert-desc">"I walked off set and all I got was this lousy apron." For those who complete all five modules.</p>
+    </div>
+    <div class="cert-card featured">
+      <div class="cert-icon">🏊</div>
+      <h3 class="cert-title">Honorary Pool Boy</h3>
+      <p class="cert-desc">For exceptional service to the community. Requires proof of valid pool maintenance certification.</p>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🔬</div>
+      <h3 class="cert-title">Ashley Madison Research Fellow</h3>
+      <p class="cert-desc">"I was just doing my column." PhD-level mastery of professional separation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section class="booking" id="booking">
+  <h2>Ready to Embrace the Inevitable?</h2>
+  <p>Join 47,832 aspiring cucks on their journey to acceptance.</p>
+  <div class="booking-stats">
+    <div class="booking-stat">
+      <span class="num">£0</span>
+      <span class="label">Class Fee<br><small>(your dignity is payment enough)</small></span>
+    </div>
+    <div class="booking-stat">
+      <span class="num">47,832</span>
+      <span class="label">On Waitlist</span>
+    </div>
+    <div class="booking-stat">
+      <span class="num">1</span>
+      <span class="label">Pool Boy<br><small>(guest instructor)</small></span>
+    </div>
+  </div>
+  <a href="#" class="booking-btn" onclick="alert('Your application has been received.\n\nYour wife has been notified.'); return false;">GET CUCKED TODAY</a>
+  <p class="booking-note">Your wife has already signed you up. No refunds.</p>
+</section>
+
+<!-- ABOUT HOST -->
+<section class="about-host">
+  <div class="host-portrait">
+    <img src="piers-cuckery-classes.jpg" alt="Cuck Morgan">
+    <span class="host-label">Cuck Morgan</span>
+  </div>
+  <div class="host-bio">
+    <h3>Piers Morgan</h3>
+    <p class="host-title">Professional Interviewer — Occasional Walker-Off — Now, Culinary Instructor</p>
+    <p>Cuck Morgan is a professional interviewer, occasional walker-off, and now, culinary instructor. His previous work includes Good Morning Britain, Piers Morgan Uncensored, and Being Roasted by His Own Wife on Live Television.</p>
+    <p>After two decades perfecting the art of the ambush interview — bright lights, big rooms, loads of cameras, and teams of people watching — Piers has turned his attention to the kitchen, where the only thing he's ambushed by is the truth.</p>
+    <div class="host-quote">
+      "If you can't beat 'em, teach 'em to cook with the heat."
+    </div>
+  </div>
+</section>
+
+<!-- LEGAL -->
+<section class="legal">
+  <div class="section-header">
+    <h2 class="section-title">Legal Notice</h2>
+    <div class="section-line"></div>
+  </div>
+  <pre>╔═══════════════════════════════════════════════════════════════════╗
+║ THE LEGAL BIT (PARODY NOTICE)                                   ║
+╠═══════════════════════════════════════════════════════════════════╣
+║ This is a work of SATIRE and PARODY.                            ║
+║                                                                   ║
+║ Piers Morgan does NOT actually teach cuckery classes.             ║
+║ (Though he did walk off live TV. That happened.                  ║
+║ Celia did post about the pool boy. That also happened.            ║
+║ He did have a six-week marriage sabbatical. Receipts exist.)      ║
+║                                                                   ║
+║ The Pool Boy is a FICTIONAL CHARACTER.                           ║
+║ (No actual pool boy was harmed or named in the making of this    ║
+║ site. Any resemblance to real pool boys is purely coincidental    ║
+║ and honestly, that's his wife's business anyway.)                 ║
+║                                                                   ║
+║ All trademarks used in parody. BBC iPlayer aesthetic is for     ║
+║ satirical effect. No endorsement by the BBC or Piers Morgan.       ║
+║                                                                   ║
+║ If you are Piers Morgan and you're reading this:                  ║
+║ • We accept payment in emotional damage                           ║
+║ • The Pool Boy AMA is still open                                  ║
+║ • Nonna says you have no bottom                                  ║
+║ • Darren says bzzzt CRUMB TRAY bzzzt                              ║
+║                                                                   ║
+║ © 2026 Cuck Media Empire. All rights reserved to the cucks.     ║
+║ No refunds. No dignity. No problem.                              ║
+╚═══════════════════════════════════════════════════════════════════╝</pre>
+</section>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-links">
+      <a href="about.html">About Us</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Use</a>
+      <a href="contact.html">Contact</a>
+      <a href="news.html">RealFakeNews</a>
+      <a href="premium.html">OnlyCucks Premium</a>
+      <a href="badactors.html">Bad Actor Registry</a>
+      <a href="ama.html">Pool Boy AMA</a>
+    </div>
+    <div class="footer-legal">
+      <p class="disclaimer">SATIRICAL PARODY — BBC is not responsible for content of this external site.</p>
+      <p>© 2026 Cuckery Classes. The Pool Boy has declined to comment. Celia Walden is on a "research trip."</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
