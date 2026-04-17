@@ -1,0 +1,7 @@
+[build]
+  command = "echo 'Using pre-built .next output'"
+  publish = ".next"
+  functions = ".next/serverless"
+
+[build.environment]
+  NODE_VERSION = "18"
