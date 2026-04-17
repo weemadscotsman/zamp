@@ -1,5 +1,5 @@
 [build]
-  command = "echo 'Using pre-built .next output'"
+  command = "npm run build"
   publish = ".next"
   functions = ".next/serverless"
 
