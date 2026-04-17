@@ -686,6 +686,9 @@ Ensure the lyrics are long enough for a complete 2-3 minute track. Start directl
     // Add era tag (default to 2020s for modern sound)
     tags.push('2020s');
 
+    // CRITICAL: Add actual artist name to tags so Sonauto knows which voice model to use
+    tags.push(realArtist);
+
     // Add vocal type based on artist gender AND selected vocal style
     tags.push(genderTag);
 
