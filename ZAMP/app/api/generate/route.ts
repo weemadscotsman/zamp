@@ -538,13 +538,13 @@ export async function POST(req: Request) {
     // Build multi-voice prompt if multiple artists
     let enhancedPrompt = '';
     if (artistList.length > 1) {
-      // Multi-voice mode: MATCHED TO WORKING FORMAT (like the Llama battles)
-      enhancedPrompt = `VOCAL BATTLE SONG:\n`;
-      artistList.forEach((a: { real: string; style: string; gender: string }, i: number) => {
-        const vocalDelivery = a.style.includes('RHYTHMIC') || a.style.includes('RAP') ? 'Rhythmic & Sharp delivery' : 'Emotional & Raw delivery';
-        const vocalistLabel = a.gender === 'FEMALE' ? 'female vocalist' : 'male vocalist';
-        enhancedPrompt += `VOCALIST ${i + 1}: ${a.real}. ROLE: ${i === 0 ? 'LEAD' : 'PARTNER'}. SINGER: ${a.real}. VOCAL STYLE: ${a.style.replace(/\.+$/, '')}. ${vocalistLabel} with ${vocalDelivery}.\n`;
-      });
+      // Multi-voice mode: MATCHED TO WORKING DUET FORMAT (Snoop + Coldplay example)
+      // Format: DUET PERFORMANCE. VOICE A: [Artist]. GENDER: [M/F]. STYLE: [desc]. [gender] voice.. [SINGING TYPE]. TOPIC: "[prompt]". MANDATE: DISTINCT VOICE ALTERNATION.
+      const vocalTypeA = artistList[0].gender === 'FEMALE' ? 'female vocalist' : 'MALE VOICE';
+      const vocalTypeB = artistList[1].gender === 'FEMALE' ? 'female vocalist' : 'MALE VOICE';
+      const genreTagA = artistList[0].style.includes('RAP') || artistList[0].style.includes('HIP') || artistList[0].style.includes('DRILL') ? 'MALE RAP CADENCE ONLY. NO MELODY.' : 'MELODIC MALE SINGING.';
+      const genreTagB = artistList[1].style.includes('RAP') || artistList[1].style.includes('HIP') || artistList[1].style.includes('DRILL') ? 'MALE RAP CADENCE ONLY. NO MELODY.' : 'MELODIC MALE SINGING.';
+      enhancedPrompt = `DUET PERFORMANCE. VOICE A: ${artistList[0].real}. GENDER: ${artistList[0].gender}. STYLE: ${artistList[0].style.replace(/\.+$/, '')}. ${vocalTypeA}.. ${genreTagA} TOPIC: "${prompt}". VOICE B: ${artistList[1].real}. GENDER: ${artistList[1].gender}. STYLE: ${artistList[1].style.replace(/\.+$/, '')}. ${vocalTypeB}.. ${genreTagB} MANDATE: DISTINCT VOICE ALTERNATION BETWEEN VOICE A AND VOICE B.`;
     } else {
       // Single voice mode - MATCHED TO WORKING MARCH FORMAT (LEAD VOICE, not PRIMARY VOICE)
       // Working format: LEAD VOICE: [Artist]. GENDER: [MALE/FEMALE]. STYLE: [desc]. [gender] vocalist. [SINGING TYPE]. PARODY STYLE. RAW STUDIO VOCALS.
