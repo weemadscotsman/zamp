@@ -7,11 +7,11 @@ const MINIMAX_API_KEY = process.env.MINIMAX_API_KEY || '';
 const ARTIST_MAP: Record<string, { real: string; gender: string; style: string }> = {
   "Snoopys Log": { real: "Snoop Dogg", gender: "MALE", style: "LAID-BACK, NASAL, SLURRED WEST COAST DRAWL. RHYTHMIC FLOW." },
   "The Pelvis": { real: "Elvis Presley", gender: "MALE", style: "Rich baritone, rockabilly vibrato, king energy." },
-  "Kitten Berry": { real: "Katy Perry", gender: "FEMALE", style: "Pop princess, playful, catchy hooks." },
-  "Taylor Swiftly": { real: "Taylor Swift", gender: "FEMALE", style: "Storytelling, pop-country, melodic." },
+  "Kitten Berry": { real: "Katy Perry", gender: "FEMALE", style: "Nasally pop tone, bright, breathy verses, powerful belting chorus, playful delivery." },
+  "Taylor Swiftly": { real: "Taylor Swift", gender: "FEMALE", style: "Twangy nasal delivery, clear country enunciation, storytelling cadence, melodic hooks." },
   "Billie Eyelash": { real: "Billie Eilish", gender: "FEMALE", style: "Haunting, whispery vocals, bass-heavy production." },
   "Eminem&M": { real: "Eminem", gender: "MALE", style: "Fast-paced, aggressive, staccato rapping." },
-  "Freddie Thermometer": { real: "Queen", gender: "MALE", style: "Brian May guitar, Freddie Mercury vocals, anthemic rock." },
+  "Freddie Thermometer": { real: "Queen", gender: "MALE", style: "Freddie Mercury: thunderous tenor, 4-octave range, operatic vibrato, SHOWMAN delivery, audience call-response." },
   "Daft Punk'd": { real: "Daft Punk", gender: "MALE", style: "Robotic vocals, French house, electronic." },
   "Derek Makson": { real: "Michael Jackson", gender: "MALE", style: "Smooth, melodic, incredible runs and falsetto." },
   "Metallica Mittens": { real: "Metallica", gender: "MALE", style: "Heavy metal, distorted guitars, powerful vocals." },
@@ -20,15 +20,15 @@ const ARTIST_MAP: Record<string, { real: string; gender: string; style: string }
   "Jazz Hands Jeff": { real: "Miles Davis", gender: "MALE", style: "Jazz trumpet, smooth improvisation." },
   "Opera Ooze": { real: "Luciano Pavarotti", gender: "MALE", style: "Powerful operatic tenor, dramatic vibrato." },
   "Parody Prince": { real: "Prince", gender: "MALE", style: "Falsetto, funk rock, sexual energy." },
-  "Mocking Madonna": { real: "Madonna", gender: "FEMALE", style: "Dance-pop, powerful vocals, catchy." },
-  "Satire Sheeran": { real: "Ed Sheeran", gender: "MALE", style: "Acoustic pop, storytelling, warm vocals." },
+  "Mocking Madonna": { real: "Madonna", gender: "FEMALE", style: "Breathy modal voice, seductive whisper verses, powerful belted chorus, dance-pop inflection." },
+  "Satire Sheeran": { real: "Ed Sheeran", gender: "MALE", style: "Soft acoustic tone, breathy delivery, melodic vocal runs, loop pedal layers, warm intimate feel." },
   "Giggle Gaga": { real: "Lady Gaga", gender: "FEMALE", style: "Powerful belter, theatrical, dance-pop." },
   "Post Malone Alone": { real: "Post Malone", gender: "MALE", style: "Autotuned, melodic, slurred delivery." },
   "The Weekend Warrior": { real: "The Weeknd", gender: "MALE", style: "R&B falsetto, dark atmosphere, smooth." },
-  "Dua Flippa": { real: "Dua Lipa", gender: "FEMALE", style: "Dance-pop, sass, disco vibes." },
-  "Bruno Mars Bars": { real: "Bruno Mars", gender: "MALE", style: "Multi-instrumentalist, retro pop, powerful voice." },
+  "Dua Flippa": { real: "Dua Lipa", gender: "FEMALE", style: "Breathy cool pop tone, rhythmic delivery, sassy attitude, disco-inflected groove." },
+  "Bruno Mars Bars": { real: "Bruno Mars", gender: "MALE", style: "Powerful soulful tenor, stunning falsetto runs, retro pop energy, dynamic range." },
   "Ariana Grandé-Latte": { real: "Ariana Grande", gender: "FEMALE", style: "Whistle notes, R&B-pop, incredible range." },
-  "Drake Snake": { real: "Drake", gender: "MALE", style: "Melodic rap, emotional, Canadian flow." },
+  "Drake Snake": { real: "Drake", gender: "MALE", style: "Toronto nasal flow, melodic hooky rapping, emotional R&B crossover, auto-tuned vulnerability." },
   "Cardi B-hive": { real: "Cardi B", gender: "FEMALE", style: "Dominant flow, Bronx energy, hip-hop." },
   "Megan Thee Stal-lion": { real: "Megan Thee Stallion", gender: "FEMALE", style: "Confident, Southern, hip-hop flow." },
   "Nicki Mi-naj": { real: "Nicki Minaj", gender: "FEMALE", style: "Rapid flow, alter egos, hip-hop." },
@@ -43,10 +43,10 @@ const ARTIST_MAP: Record<string, { real: string; gender: string; style: string }
   "Michael Jack-son": { real: "Michael Jackson", gender: "MALE", style: "Smooth, incredible runs, pop perfection." },
   "Ed Shearing": { real: "Ed Sheeran", gender: "MALE", style: "Acoustic pop, storytelling, warm vocals." },
   "Kendrick Llama": { real: "Kendrick Lamar", gender: "MALE", style: "Intelligent rap, socially conscious, poetic." },
-  "Justin Bee-ber": { real: "Justin Bieber", gender: "MALE", style: "Pop vocals, youthful, catchy." },
-  "Selena Go-mez": { real: "Selena Gomez", gender: "FEMALE", style: "Pop vocals, clean production, melodic." },
-  "Shawn Men-des": { real: "Shawn Mendes", gender: "MALE", style: "Acoustic pop, sincere vocals, guitar-driven." },
-  "Camila Ca-bello": { real: "Camila Cabello", gender: "FEMALE", style: "Latin pop, sensual, powerful vocals." },
+  "Justin Bee-ber": { real: "Justin Bieber", gender: "MALE", style: "Light youthful tenor, breathy pop tone, smooth melodic runs, gentle falsetto." },
+  "Selena Go-mez": { real: "Selena Gomez", gender: "FEMALE", style: "Soft breathy pop tone, intimate delivery, clean melodic lines, gentle intimacy." },
+  "Shawn Men-des": { real: "Shawn Mendes", gender: "MALE", style: "Pure clean tenor, acoustic intimacy, sincere earnest delivery, soft falsetto." },
+  "Camila Ca-bello": { real: "Camila Cabello", gender: "FEMALE", style: "Latin-accented warmth, sensual whisper verses, powerful chest voice, Havana flow." },
   "Harry Styles-ish": { real: "Harry Styles", gender: "MALE", style: "Retro pop rock, charismatic, falsetto." },
   "Miley Cy-rus": { real: "Miley Cyrus", gender: "FEMALE", style: "Powerful belter, rock influences, edgy." },
   "Demi Lo-vato": { real: "Demi Lovato", gender: "FEMALE", style: "Powerful vocals, pop-rock, emotional." },
@@ -84,13 +84,13 @@ const ARTIST_MAP: Record<string, { real: string; gender: string; style: string }
   "Eazy-E-rider": { real: "Eazy-E", gender: "MALE", style: "Gangsta rap, raw, N.W.A." },
   "50 Cent-ipede": { real: "50 Cent", gender: "MALE", style: "Hardcore rap, catchy hooks, trauma." },
   "Rihanna-nana": { real: "Rihanna", gender: "FEMALE", style: "R&B-pop, seductive, powerful." },
-  "Beyoncé-nce": { real: "Beyoncé", gender: "FEMALE", style: "Powerful vocals, pop-R&B, commanding presence." },
-  "Alicia Keys-board": { real: "Alicia Keys", gender: "FEMALE", style: "Soulful piano pop, powerful vocals." },
-  "John Leg-end": { real: "John Legend", gender: "MALE", style: "Soulful pop, smooth falsetto, romantic." },
-  "Usher-er": { real: "Usher", gender: "MALE", style: "R&B vocals, smooth moves, seductive." },
-  "Chris Brown-ie": { real: "Chris Brown", gender: "MALE", style: "R&B vocals, smooth, danceable." },
+  "Beyoncé-nce": { real: "Beyoncé", gender: "FEMALE", style: "Massive chest voice, stunning runs, gospel power, commanding queen presence, Destiny's Child harmonies." },
+  "Alicia Keys-board": { real: "Alicia Keys", gender: "FEMALE", style: "Raw soulful piano voice, gospel power, Harlem church roots, commanding range." },
+  "John Leg-end": { real: "John Legend", gender: "MALE", style: "Silky falsetto, romantic ballad style, smooth melismatic runs, velvet piano man." },
+  "Usher-er": { real: "Usher", gender: "MALE", style: "Smooth R&B tenor, seduction falsetto, Yeah! Yeah! Yeah! energy, velvet smoothness." },
+  "Chris Brown-ie": { real: "Chris Brown", gender: "MALE", style: "Smooth R&B tenor, Knee-slap dance runs, tender ballad falsetto, Yricsation flow." },
   "Trey Songz-birds": { real: "Trey Songz", gender: "MALE", style: "R&B vocals, seductive, emotional." },
-  "Ne-Yo-yo": { real: "Ne-Yo", gender: "MALE", style: "R&B vocals, smooth, songwriter." },
+  "Ne-Yo-yo": { real: "Ne-Yo", gender: "MALE", style: "Smooth melodic falsetto, silky R&B smoothness, smooth writer's delivery." },
   "Mario-kart": { real: "Mario", gender: "MALE", style: "R&B vocals, early 2000s, smooth." },
   "Omarion-ette": { real: "Omarion", gender: "MALE", style: "R&B vocals, dance, funky." },
   "Bow Wow-wow": { real: "Bow Wow", gender: "MALE", style: "Rap vocals, youthful, pop-rap." },
@@ -99,7 +99,7 @@ const ARTIST_MAP: Record<string, { real: string; gender: string; style: string }
   "Akon-vict": { real: "Akon", gender: "MALE", style: "Auto-tuned Senegalese pop, crossover." },
   "Sean Paul-bearer": { real: "Sean Paul", gender: "MALE", style: "Dancehall, reggae fusion, energetic." },
   "Shag-gy": { real: "Shaggy", gender: "MALE", style: "Dancehall, comedic, catchy." },
-  "Queen Bee": { real: "Beyoncé", gender: "FEMALE", style: "Queen Bee energy, powerful, commanding." },
+  "Queen Bee": { real: "Beyoncé", gender: "FEMALE", style: "Diva power vocals, Single Ladies punch, Formation Texas swagger, flawless run." },
   "Prince Charming": { real: "Prince", gender: "MALE", style: "Falsetto, funk rock, sexual energy." },
   "Madonna Kebab": { real: "Madonna", gender: "FEMALE", style: "Dance-pop, powerful vocals, catchy." },
   "Nirvan-nah": { real: "Nirvana", gender: "MALE", style: "Grunge, anguished vocals, raw." },
@@ -542,23 +542,15 @@ export async function POST(req: Request) {
       enhancedPrompt = `VOCAL BATTLE SONG:\n`;
       artistList.forEach((a: { real: string; style: string; gender: string }, i: number) => {
         const vocalDelivery = a.style.includes('RHYTHMIC') || a.style.includes('RAP') ? 'Rhythmic & Sharp delivery' : 'Emotional & Raw delivery';
-        const vocalistLabel = a.gender === 'FEMALE' ? 'female vocalist vocalist' : 'male vocalist vocalist';
+        const vocalistLabel = a.gender === 'FEMALE' ? 'female vocalist' : 'male vocalist';
         enhancedPrompt += `VOCALIST ${i + 1}: ${a.real}. ROLE: ${i === 0 ? 'LEAD' : 'PARTNER'}. SINGER: ${a.real}. VOCAL STYLE: ${a.style.replace(/\.+$/, '')}. ${vocalistLabel} with ${vocalDelivery}.\n`;
       });
     } else {
-      // Single voice mode - MATCHED TO WORKING MARCH FORMAT
-      // Uses LEAD VOICE format like the working Coldplay/Dave/Post Malone generations
+      // Single voice mode - MATCHED TO WORKING MARCH FORMAT exactly
+      // Format: PRIMARY VOICE: [Artist]. ROLE: LEAD. Singing like [Artist]. Vocal style: [desc]. [gender] vocalist vocalist with [delivery] delivery.
       const vocalType = primaryArtist.gender === 'FEMALE' ? 'female vocalist' : 'male vocalist';
-      const vocalDelivery = primaryArtist.style.includes('RHYTHMIC') || primaryArtist.style.includes('RAP') ? 'Rhythmic & Sharp delivery' : 'Emotional & Raw delivery';
-      enhancedPrompt = `LEAD VOICE: ${realArtist}. GENDER: ${primaryArtist.gender}. STYLE: ${primaryArtist.style.replace(/\.+$/, '')}. ${vocalType}. `;
-      // Add specific singing style hints based on genre
-      if (genre && (genre.toLowerCase().includes('rap') || genre.toLowerCase().includes('drill') || genre.toLowerCase().includes('grime'))) {
-        enhancedPrompt += `RAP CADENCE ONLY. `;
-      } else if (genre && (genre.toLowerCase().includes('metal') || genre.toLowerCase().includes('rock'))) {
-        enhancedPrompt += `POWER VOCALS. `;
-      } else {
-        enhancedPrompt += `MELODIC SINGING. `;
-      }
+      const vocalDelivery = primaryArtist.style.includes('RHYTHMIC') || primaryArtist.style.includes('RAP') ? 'Rhythmic & Sharp' : 'Emotional & Raw';
+      enhancedPrompt = `PRIMARY VOICE: ${realArtist}. ROLE: LEAD. Singing like ${realArtist}. Vocal style: ${primaryArtist.style.replace(/\.+$/, '')}. ${vocalType} vocalist with ${vocalDelivery} delivery.`;
     }
     if (persona && persona !== 'The Rebel') {
       enhancedPrompt += `Sung from the perspective of: ${persona}. `;
