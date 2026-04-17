@@ -538,18 +538,27 @@ export async function POST(req: Request) {
     // Build multi-voice prompt if multiple artists
     let enhancedPrompt = '';
     if (artistList.length > 1) {
-      // Multi-voice mode: MATCHED TO WORKING FORMAT
-      enhancedPrompt = `MULTI-VOCAL SONG:\n`;
-      artistList.forEach((a, i) => {
-        const vocalDelivery = a.style.includes('RHYTHMIC') ? 'Rhythmic & Sharp delivery' : 'Smooth & Melodic delivery';
-        enhancedPrompt += `VOICE ${i + 1}: ${a.real}. ROLE: ${i === 0 ? 'LEAD' : 'FEATURE'}. Singing like ${a.real}. Vocal style: ${a.style.replace(/\.+$/, '')}. ${a.gender === 'FEMALE' ? 'female vocalist' : 'male vocalist'} with ${vocalDelivery}.\n`;
+      // Multi-voice mode: MATCHED TO WORKING FORMAT (like the Llama battles)
+      enhancedPrompt = `VOCAL BATTLE SONG:\n`;
+      artistList.forEach((a: { real: string; style: string; gender: string }, i: number) => {
+        const vocalDelivery = a.style.includes('RHYTHMIC') || a.style.includes('RAP') ? 'Rhythmic & Sharp delivery' : 'Emotional & Raw delivery';
+        const vocalistLabel = a.gender === 'FEMALE' ? 'female vocalist vocalist' : 'male vocalist vocalist';
+        enhancedPrompt += `VOCALIST ${i + 1}: ${a.real}. ROLE: ${i === 0 ? 'LEAD' : 'PARTNER'}. SINGER: ${a.real}. VOCAL STYLE: ${a.style.replace(/\.+$/, '')}. ${vocalistLabel} with ${vocalDelivery}.\n`;
       });
-      enhancedPrompt += `Genre: ${genre || 'pop'}. Mood: ${mood || 'energetic'}. Tempo: ${tempo || 'Mid-tempo'}. `;
     } else {
-      // Single voice mode - MATCHED TO WORKING MARCH 25th FORMAT
-      const vocalDelivery = primaryArtist.style.includes('RHYTHMIC') ? 'Rhythmic & Sharp delivery' : 'Smooth & Melodic delivery';
-      enhancedPrompt = `PRIMARY VOICE: ${realArtist}. ROLE: LEAD. Singing like ${realArtist}. Vocal style: ${primaryArtist.style.replace(/\.+$/, '')}. ${genderTag} with ${vocalDelivery}. `;
-      enhancedPrompt += `Genre: ${genre || 'pop'}. Mood: ${mood || 'energetic'}. Tempo: ${tempo || 'Mid-tempo'}. `;
+      // Single voice mode - MATCHED TO WORKING MARCH FORMAT
+      // Uses LEAD VOICE format like the working Coldplay/Dave/Post Malone generations
+      const vocalType = primaryArtist.gender === 'FEMALE' ? 'female vocalist' : 'male vocalist';
+      const vocalDelivery = primaryArtist.style.includes('RHYTHMIC') || primaryArtist.style.includes('RAP') ? 'Rhythmic & Sharp delivery' : 'Emotional & Raw delivery';
+      enhancedPrompt = `LEAD VOICE: ${realArtist}. GENDER: ${primaryArtist.gender}. STYLE: ${primaryArtist.style.replace(/\.+$/, '')}. ${vocalType}. `;
+      // Add specific singing style hints based on genre
+      if (genre && (genre.toLowerCase().includes('rap') || genre.toLowerCase().includes('drill') || genre.toLowerCase().includes('grime'))) {
+        enhancedPrompt += `RAP CADENCE ONLY. `;
+      } else if (genre && (genre.toLowerCase().includes('metal') || genre.toLowerCase().includes('rock'))) {
+        enhancedPrompt += `POWER VOCALS. `;
+      } else {
+        enhancedPrompt += `MELODIC SINGING. `;
+      }
     }
     if (persona && persona !== 'The Rebel') {
       enhancedPrompt += `Sung from the perspective of: ${persona}. `;
@@ -688,19 +697,6 @@ Ensure the lyrics are long enough for a complete 2-3 minute track. Start directl
     // Add vocal type based on artist gender AND selected vocal style
     tags.push(genderTag);
 
-    // Add concert/live tags for that arena energy (what made Coldplay/Post Malone work)
-    tags.push('live');
-    tags.push('concert');
-
-    // Add opposite gender vocalist for crowd backing vocal effect
-    // Male artists get female backing vocals for crowd sound
-    // Female artists get male backing vocals for crowd sound
-    if (genderTag === 'male vocalist') {
-      tags.push('female vocalist');
-    } else {
-      tags.push('male vocalist');
-    }
-
     // Add vocal style tags if specified and not 'mixed' (which means let API decide)
     if (vocalStyle && vocalStyle !== 'mixed' && VOCAL_TAGS[vocalStyle]) {
       const vocalTags = VOCAL_TAGS[vocalStyle];
@@ -710,6 +706,10 @@ Ensure the lyrics are long enough for a complete 2-3 minute track. Start directl
         }
       });
     }
+
+    // Add PARODY STYLE and RAW STUDIO VOCALS like working generations
+    tags.push('PARODY STYLE');
+    tags.push('RAW STUDIO VOCALS');
 
     let requestBody: any = {};
 
