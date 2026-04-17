@@ -546,11 +546,11 @@ export async function POST(req: Request) {
         enhancedPrompt += `VOCALIST ${i + 1}: ${a.real}. ROLE: ${i === 0 ? 'LEAD' : 'PARTNER'}. SINGER: ${a.real}. VOCAL STYLE: ${a.style.replace(/\.+$/, '')}. ${vocalistLabel} with ${vocalDelivery}.\n`;
       });
     } else {
-      // Single voice mode - MATCHED TO WORKING MARCH FORMAT exactly
-      // Format: PRIMARY VOICE: [Artist]. ROLE: LEAD. Singing like [Artist]. Vocal style: [desc]. [gender] vocalist vocalist with [delivery] delivery.
+      // Single voice mode - MATCHED TO WORKING MARCH FORMAT (LEAD VOICE, not PRIMARY VOICE)
+      // Working format: LEAD VOICE: [Artist]. GENDER: [MALE/FEMALE]. STYLE: [desc]. [gender] vocalist. [SINGING TYPE]. PARODY STYLE. RAW STUDIO VOCALS.
       const vocalType = primaryArtist.gender === 'FEMALE' ? 'female vocalist' : 'male vocalist';
-      const vocalDelivery = primaryArtist.style.includes('RHYTHMIC') || primaryArtist.style.includes('RAP') ? 'Rhythmic & Sharp' : 'Emotional & Raw';
-      enhancedPrompt = `PRIMARY VOICE: ${realArtist}. ROLE: LEAD. Singing like ${realArtist}. Vocal style: ${primaryArtist.style.replace(/\.+$/, '')}. ${vocalType} vocalist with ${vocalDelivery} delivery.`;
+      const genreTag = primaryArtist.style.includes('RAP') || primaryArtist.style.includes('HIP') || primaryArtist.style.includes('DRILL') ? 'RAP CADENCE ONLY' : 'MELODIC SINGING';
+      enhancedPrompt = `LEAD VOICE: ${realArtist}. GENDER: ${primaryArtist.gender}. STYLE: ${primaryArtist.style.replace(/\.+$/, '')}. ${vocalType}. ${genreTag}. PARODY STYLE. RAW STUDIO VOCALS.`;
     }
     if (persona && persona !== 'The Rebel') {
       enhancedPrompt += `Sung from the perspective of: ${persona}. `;
