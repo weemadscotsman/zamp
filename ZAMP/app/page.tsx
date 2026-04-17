@@ -1400,12 +1400,27 @@ export default function WinampApp() {
                   </div>
                   <div className="p-2 bg-black/30 rounded">
                     <div className="text-[8px] opacity-50 mb-1">XRP</div>
-                    <div className="font-mono break-all leading-tight">r4GsC1Dq3LQJ5N2v2xK7p8tQ9f8h3J6kL + tag 123456</div>
+                    <div className="font-mono break-all leading-tight">rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh</div>
+                  </div>
+                  <div className="p-2 bg-black/30 rounded">
+                    <div className="text-[8px] opacity-50 mb-1">XLM</div>
+                    <div className="font-mono break-all leading-tight">GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SQ5WQ4PS</div>
                   </div>
                   <div className="p-2 bg-black/30 rounded">
                     <div className="text-[8px] opacity-50 mb-1">MATIC</div>
                     <div className="font-mono break-all leading-tight">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
                   </div>
+                  <a
+                    href="https://ko-fi.com/dreamlabsdreamforge"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-[#ff464f] hover:bg-[#ff5865] rounded text-white font-bold text-sm transition-colors"
+                  >
+                    <svg viewBox="0 0 32 32" className="w-4 h-4" fill="currentColor">
+                      <path d="M4 4h24v24H4V4zm4 8h16v2H8v-2zm0 4h12v2H8v-2zm0 4h8v2H8v-2z"/>
+                    </svg>
+                    Support on Ko-fi
+                  </a>
                 </div>
                 <p className="text-[10px] opacity-50 mt-2">Send payment and email proof to zamp@cann.on.ai for manual credit activation.</p>
               </div>
@@ -1434,6 +1449,14 @@ export default function WinampApp() {
               <div className={`p-2 ${currentSkin.panel}`}>
                 <div className="text-xs opacity-70 mb-1">SOL</div>
                 <div className="font-mono text-xs break-all">HN7cABqLq46Es1jh92dQQisAq662SmxELLLsHHe4YWrH</div>
+              </div>
+              <div className={`p-2 ${currentSkin.panel}`}>
+                <div className="text-xs opacity-70 mb-1">XRP</div>
+                <div className="font-mono text-xs break-all">rEb8TK3gBgk5auZkwc6sHnwrGVJH8DuaLh</div>
+              </div>
+              <div className={`p-2 ${currentSkin.panel}`}>
+                <div className="text-xs opacity-70 mb-1">XLM</div>
+                <div className="font-mono text-xs break-all">GDUKMGUGDZQK6YHYA5Z6AY2G4XDSZPSZ3SQ5WQ4PS</div>
               </div>
             </div>
           </div>
